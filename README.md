@@ -9,7 +9,7 @@ No seu terminal, digite:
 
 ## Programando Arduino com o Atom
 
-1. Instale o pacote `platomformio` no atom.
+1. Instale o pacote `platomformio` no atom (Edit -> Preferences -> Install).
 1. Instale o pacote python para comunicação:
  `pip install platformio`
 1. Na pasta onde ficará o código rode: `platformio init --board=uno`
@@ -19,7 +19,10 @@ No seu terminal, digite:
 
 ## Protocolo de comunicação entre o Arduino e o Computador
  A comunicação foi feita através da porta serial com baudrate de 9600.
- Pacotes:
+
+* **Arduino -> Computador**
+
+Pacotes:
 
  Starter | Tipo | Informação | Finalizador
  ------- | ---- | ---------- | -----------
@@ -28,6 +31,17 @@ No seu terminal, digite:
 
 Sendo 'U' o indicador que será enviado um valor de Umidade (porcentagem).
 E 'T' o indicador que será enviado um valor de Temperatura (graus celcius).
+
+* **Computador -> Arduino**
+
+O Computador envia comandos para o Arduino. São eles:
+
+CMD | Descrição
+--- | ---------
+'U' | Ligar o irrigador
+'u' | Desligar o irrigador
+'T' | Ligar um ventilador
+'t' | Desligar o irrigador
 
 ## Group components
 - Pablo Nunes
