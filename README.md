@@ -3,6 +3,10 @@
 In this project we created a data logger using an Arduino board to store
 temperature and humidity from soil and ar into a database on localhost.
 
+## Instalando a biblioteca psycopg2 no python
+No seu terminal, digite:
+1. `sudo apt-get install psycopg2`
+
 ## Programando Arduino com o Atom
 
 1. Instale o pacote `platomformio` no atom.
