@@ -46,7 +46,7 @@ CMD | Descrição
 ## Group components
 - Pablo Nunes
 - Paulo Camargos
-- Thiago Pereira
+- Thiago Pereira de Oliveira
 - Vítor Menezes
 
 Colaborations: Ítalo Fernandes - github.com/italogfernandes
