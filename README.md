@@ -8,3 +8,5 @@ temperature and humidity from soil and ar into a database on localhost.
 - Paulo Camargos
 - Thiago Pereira
 - Vítor Menezes
+
+Colaborations: Ítalo Fernandes - github.com/italogfernandes
