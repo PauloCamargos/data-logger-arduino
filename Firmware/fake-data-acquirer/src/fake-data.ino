@@ -18,7 +18,6 @@
 ////////////////
 //Comunicação //
 ////////////////
-#define COMM_START          '$'
 #define COMM_UMIDADE        'U'
 #define COMM_TEMPERATURA    'T'
 #define COMM_END            '\n'

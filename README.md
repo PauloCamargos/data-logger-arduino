@@ -24,10 +24,10 @@ No seu terminal, digite:
 
 Pacotes:
 
- Starter | Tipo | Informação | Finalizador
- ------- | ---- | ---------- | -----------
- '$' | 'U' | '29' | '\n'
- '$' | 'T' | '25.0' | '\n'
+  Tipo | Informação | Finalizador
+  ---- | ---------- | -----------
+  'U' | '29' | '\n'
+  'T' | '25.0' | '\n'
 
 Sendo 'U' o indicador que será enviado um valor de Umidade (porcentagem).
 E 'T' o indicador que será enviado um valor de Temperatura (graus celcius).
@@ -38,6 +38,7 @@ O Computador envia comandos para o Arduino. São eles:
 
 CMD | Descrição
 --- | ---------
+'R' | Ler os sensores
 'U' | Ligar o irrigador
 'u' | Desligar o irrigador
 'T' | Ligar um ventilador
