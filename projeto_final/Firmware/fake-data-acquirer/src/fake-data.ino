@@ -30,6 +30,8 @@ float fake_temp, fake_umid;
 
 void setup(){
     Serial.begin(9600);
+    pinMode(PINO_VENTILADOR, OUTPUT);
+    pinMode(COMM_TEMPERATURA, OUTPUT);
     fake_temp = 15;
     fake_umid = 10;
 }
