@@ -2,60 +2,55 @@ import psycopg2
 import time
 import serial
 
-print ("Iniciando programa...")
+
+def main():
+    banco = Banco('projects','arduinoproject','postgres','banco')
+    # Cria conexao:
+    banco.connection();
+    banco.insertDataInto(table='environment', description='soil')
+    banco.selectAllDataFrom(table='environment')
+
 
 class Banco:
-    """Short summary.
+    """Database class. Use this class to create connection e execute CRUD
+    commands on a database.
 
     Parameters
     ----------
-    database : type
-        Description of parameter `database`.
+    database : String
+        Database name.
     schema : type
-        Description of parameter `schema`.
-    user : type
-        Description of parameter `user`.
+        Schema which the tables are stored.
+    user : String
+        User's username to access to database.
     password : type
-        Description of parameter `password`.
-
-    Attributes
-    ----------
-    port : type
-        Description of attribute `port`.
+        User's password to access the database.
+    port : int
+        Port number which the database uses.
     host : type
-        Description of attribute `host`.
-    con : type
-        Description of attribute `con`.
-    cur : type
-        Description of attribute `cur`.
-    query : type
-        Description of attribute `query`.
-    database        schema        user        password
-
+        Database host address.
     """
 
-    def __init__(self, database, schema, user, password):
+    def __init__(self, database, schema, user, password, port=5432, host='localhost'):
         self.database = database
         self.schema = schema
         self.user = user
         self.password = password
-        self.port = 5432
-        self.host = "localhost"
+        self.port = port
+        self.host = host
         self.con = None
         self.cur = None
         self.query = None
 
     def connection(self):
-        """Short summary.
+        """Creates connection with the database using the specified parameter at
+        the class constructor.
 
         Returns
         -------
-        type
-            Description of returned object.
-
+        void
         """
 
-        print('Conectando com o banco de dados ...')
         try:
             self.con = psycopg2.connect(database=self.database,
                                         user=self.user,
@@ -69,27 +64,28 @@ class Banco:
             print("exception: " + error)
 
     def insertDataInto(self, table, **kwargs):
-        """Short summary.
+        """Inserts data into a table using the parameters as fields and it's
+        values as data to be inserted.
 
         Parameters
         ----------
         table : String
-            Name of the table to insert.
-        **kwargs : Dictionary
-            Table fields and it's corresopndent values.
+            Table which the data will be inserted.
+        **kwargs : String
+            Fields and values to be inserted in the table. Use the template
+            fieldName='value' to pass the columns and values. Ilimited number of
+            parameters allowed here.
 
         Returns
         -------
-        type
-            Description of returned object.
-
+        void
         """
 
         fields = []
         values = []
         unknownValues = []
         self.query = "INSERT INTO " + self.schema + "." + table
-        # query = "INSERT INTO arduinoproject." + table + ()"
+
         for key in kwargs:
             # Table's fields
             fields.append(key);
@@ -101,11 +97,13 @@ class Banco:
         # Reversing to keep fields and values in the right order
         fields.reverse()
         values.reverse()
+
+        # Converting the lists in string
         knownFields = ", ".join(fields)
         placehold = ', '.join(unknownValues)
-        if(len(values) == 1):
+
+        if(len(values) == 1): # Case only one value is inserted
             self.cur.execute("INSERT INTO " + self.schema + "." + table + "(" + knownFields + ") VALUES ('" + str(values[0]) + "')")
-            self.con.commit()
         else:
             knownValues = tuple(values)
             self.query = "INSERT INTO " + self.schema + "." + table + "(" + knownFields + ") VALUES(" + placehold + ")"
@@ -114,28 +112,65 @@ class Banco:
             self.cur.executemany(self.query, knownValues)
 
         self.con.commit()
-        # self.cur.close()
-        # # self.cur.execute("INSERT INTO aulas.tb_log(valor) VALUES (" + str(value) + ")")
-        # self.cur.execute("INSERT INTO arduinoproject.environment(description) VALUES ('" + str(value) + "')")
-        # self.con.commit()
-        # print("Valor '" + value  + "' inserido no BD com sucesso!")
 
     def selectDataFrom(self, table):
+        """Selects one row data from the specified table.
+
+        Parameters
+        ----------
+        table : String
+            Table name which data will be fetched.
+
+        Returns
+        -------
+        String
+            Value fetched from the query.
+        """
+
         self.cur.execute('SELECT * FROM ' + self.schema + '.' + table)
         data_output = self.cur.fetchone();
         print(data_output)
 
+        return data_output
+
     def selectAllDataFrom(self, table):
+        """Selects all data from the specified table.
+
+        Parameters
+        ----------
+        table : String
+            Table name which data will be fetched.
+
+        Returns
+        -------
+        String tuple
+            Values fetched from the query. Each tuple represents a row.
+        """
         self.cur.execute('SELECT * FROM ' + self.schema + '.' + table)
         rows = self.cur.fetchall()
         for row in rows:
             print row
 
+        return rows
+
     def closeConnecetion(self):
+        """Closes the connection.
+
+        Returns
+        -------
+        void
+        """
+
         self.con.close()
 
-banco = Banco('projects','arduinoproject','postgres','banco')
-# Cria conexao:
-banco.connection();
-banco.insertDataInto(table='environment', description='soil')
-banco.selectAllDataFrom(table='environment')
+    def updataDataFrom(self, table):
+        pass
+        # TODO: Create update method
+
+    def deleteDataFrom(self, table):
+        pass
+        # TODO: Create delet method
+
+
+if __name__ == "__main__":
+    main()
