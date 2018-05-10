@@ -8,7 +8,7 @@
 //Comandos //
 /////////////
 #define CMD_LIGAR_VENTILADOR    'T'
-#define CMD_DESLIGAR_VENTILAR   't'
+#define CMD_DESLIGAR_VENTILADOR 't'
 
 #define CMD_LIGAR_IRRIGADOR     'U'
 #define CMD_DESLIGAR_IRRIGADOR  'u'
@@ -51,11 +51,9 @@ void loop(){
             digitalWrite(PINO_IRRIGADOR, LOW);
             break;
             case CMD_LER_DADOS:
-            Serial.write(COMM_START);
             Serial.write(COMM_TEMPERATURA);
             Serial.print(fake_temp, 2);
             Serial.write(COMM_END);
-            Serial.write(COMM_START);
             Serial.write(COMM_UMIDADE);
             Serial.print(fake_umid, 2);
             Serial.write(COMM_END);
