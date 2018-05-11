@@ -7,8 +7,9 @@ def main():
     banco = Banco('projects','arduinoproject','postgres','banco')
     # Cria conexao:
     banco.connection();
-    banco.insertDataInto(table='environment', description='soil')
-    banco.selectAllDataFrom(table='environment')
+    banco.insertDataInto(table='physical_quantity', description='temperature', unity='oC')
+    # banco.insertDataInto(table='environment', description='soil')
+    banco.selectAllDataFrom(table='physical_quantity')
 
 
 class Banco:

@@ -43,7 +43,7 @@ def readAll():
     # TODO: implement database queries
 
 #  Option 4
-def selectOneRecord():
+def selectLastRecord():
     # TODO: implement fetchOne query
 
 # Option 5
@@ -72,13 +72,32 @@ def menu():
     print('7 - Delete all record')
     print('------------------------------------------\n')
 
+menu()
+
 while True:
-    print("------------ BEGINNING PROGRAM -------------")
     checkUser()
-    menu()
     item = str(input("SELECT A OPTION: "))
 
-    switch
     if item == '0':
         break
-    elif
+    elif item == '1':
+        print("Reading and inserting TEMPERATURE data into DB...")
+        readTemperature();
+    elif item == '2':
+        print("Reading and inserting UMIDITY data into DB...")
+        readUmidity();
+    elif item == '3':
+        print("Reading and inserting ALL data into DB...")
+        readAll();
+    elif item == '4':
+        print("Searching  LAST record data from DB...")
+        selectLastRecord();
+    elif item == '5':
+        print("Searching  ALL record data from DB...")
+        selectAllRecord();
+    elif item == '6':
+        print("Deleting  LAST record data from DB...")
+        deleteLastRecord();
+    elif item == '7':
+        print("Deletgin  ALL record data from DB...")
+        deleteAllRecord();

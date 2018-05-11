@@ -1,4 +1,4 @@
-#define TEMPERATURE A0
+#define TEMPERATURE A3
 #define UMIDITY     A1
 
 float read_temperature;
