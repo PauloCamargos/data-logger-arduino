@@ -46,6 +46,7 @@ def readAll():
 def selectOneRecord():
     # TODO: implement fetchOne query
 
+
 # Option 5
 def selectAllRecord():
     # TODO: implement fetchall query
