@@ -33,6 +33,9 @@ module_level_variable1 : int
 
 from serialHandler import ArduinoHandler
 from threadHandler import InfiniteTimer
+import database
+import time
+
 #TODO: importar comunicação com banco de dados
 
 class data_logger_app:
@@ -40,18 +43,38 @@ class data_logger_app:
     This class represents the main data_logger application
     """
     def __init__(self):
-        arduino_acq = ArduinoHandler(port_name='/dev/ttyUSB0')
-        pass
+        self.arduino_acq = ArduinoHandler()
+        self.timer_acq = InfiniteTimer(interval=10.0,
+                                       worker=self.do_acquisition,
+                                       on_end_function=self.close_connections)
+        self.database = database.Banco('database_italo','arduinoproject',
+                                        'postgres','banco')
+
+    def insert_new_measure_into_db(self, temperature, humidity):
+        # self.database.insertDataInto(table='physical_quantity',
+        #                         description='temperature',
+        #                         unity='Xablaus')
+        self.database.insertDataInto(table='measures',
+                                read_value=temperature)
+
+        # self.database.insertDataInto(table='physical_quantity',
+        #                         description='humidity',
+        #                         unity='Nao Sei')
+        self.database.insertDataInto(table='measures',
+                                read_value=humidity)
 
     def run(self):
-        pass
+        self.start()
+        self.timer_acq.start()
 
     def start(self):
-        arduino_acq.open()
-        timer_acq = InfiniteTimer(interval=30.0,
-         worker=self.do_acquisition,
-         on_end_function=self.close_connections)
-         timer_acq.start()
+        print("Started")
+        self.database.connection()
+        self.arduino_acq.open()
+        time.sleep(1)
+
+    def close_connections(self):
+        print("Finalizado")
 
     def do_acquisition(self):
         """Pega um valor do arduino e envia para o banco de dados
@@ -61,11 +84,28 @@ class data_logger_app:
         # TODO: Fazer do_acquisition method
         # arduino_acq.get_readings_dict
         # database.insert()
-        pass
+        readings = self.arduino_acq.get_readings_dict()
+        print("Leituras" + str(readings))
+        self.insert_new_measure_into_db(readings['Temperatura'], readings['Umidade'])
+        self.database.selectAllDataFrom(table='measures')
 
+def menu():
+    print('--------------- MENU -----------------------')
+    print('0 - EXIT PROGRAM')
+    print('1 - Read values')
+    print('2 - Start Timer')
+    print('4 - Visualize the last record')
+    print('5 - Visualize all record')
+    print('6 - Delete last record')
+    print('7 - Delete all record')
+    print('------------------------------------------\n')
+
+import time
 def main():
     main_app = data_logger_app()
     main_app.run()
+    #time.sleep(2)
+    #main_app.do_acquisition()
 
 if __name__ == '__main__':
     main()
