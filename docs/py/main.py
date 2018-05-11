@@ -2,7 +2,7 @@
 import database
 import time
 import serial
-
+import os
 # Iniciando conexao serial
 #comport = serial.Serial('/dev/ttyUSB0', 9600, timeout=1) # Setando timeout 1s para a conexao
 
@@ -14,57 +14,69 @@ database = database.Banco('projects','arduinoproject','postgres','banco')
 database.connection()
 
 
-def startSerial():
-    # NOTE: o pyserial ja abre a porta serial qnd se inicializa deste modo
-    comport = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
-    return comport
+# def startSerial():
+#     # NOTE: o pyserial ja abre a porta serial qnd se inicializa deste modo
+#
+#     return comport
+comport = serial.Serial('/dev/ttyACM0', 9600, timeout=4)
 
 def readUnity(PARAM_CARACTER):
     # NOTE: para cada leitura ele esta abrindo e fechando a porta Serial
     # Isso não é mto otimizado
-    comport = startConnection();
     comport.write(PARAM_CARACTER)
-    VALUE_SERIAL=comport.readline()
-    print '%s. Retorno da serial: %s' % (PARAM_CARACTER, VALUE_SERIAL)
-    comport.close()
+    VALUE_SERIAL=float(comport.readline())
+    # print '%s. Retorno da serial: %s' % (PARAM_CARACTER, VALUE_SERIAL)
     return VALUE_SERIAL
 
 # Option 1
 def readTemperature():
-    # NOTE: O arduino estã com código para ler os 2 valores ao mesmo tempo
-    # Ao receber o comando 'R'
     read_temperature = readUnity('T')
+    print("A temperatura lida é: " + str(read_temperature))
     #columns: id_user, id_envrmt, read_value
-    database.insertDataInto(table='measures',id_user=id_loggedUser,read_value=read_temperature )
+    database.insertDataInto(table='measures',id_user=USER_ID, id_envrmt=1, read_value=read_temperature)
 
 # Option 2
 def readUmidity():
-    readUnity('U')
+    read_umidity = readUnity('U')
+    print("A umidade lida é: " + read_umidity)
+    #columns: id_user, id_envrmt, read_value
+    database.insertDataInto(table='measures',id_user=USER_ID, id_envrmt=1, read_value=read_temperature )
+
 
 # Option 3
 def readAll():
-    temperature = readUnity('T')
-    umidity = readUnity('U')
-    # TODO: implement database queries
+    read_temperature = readUnity('T')
+    read_umidity = readUnity('U')
+    print("Temperatura: " + read_temperature)
+    print("Umidade: " + read_umidity)
+
 
 #  Option 4
 def selectLastRecord():
+    pass
     # TODO: implement fetchOne query
 
 
 # Option 5
 def selectAllRecord():
+    pass
     # TODO: implement fetchall query
 
+
 def deleteLastRecord():
+    pass
     # TODO: implement delete query
 
+
 def deleteAllRecord():
+    pass
     # TODO: impolement delete all query
 
+
 def checkUser():
-    USER_ID = input('Insert your user ID:')
+    USER_ID = input('Insert your user ID: ')
     return USER_ID
+
 
 def menu():
     print('--------------- MENU -----------------------')
@@ -76,15 +88,18 @@ def menu():
     print('5 - Visualize all record')
     print('6 - Delete last record')
     print('7 - Delete all record')
+    print('8 - Limpar tela')
     print('------------------------------------------\n')
 
-menu()
-        >>>
-while True:
-    checkUser()
-    item = str(input("SELECT A OPTION: "))
 
+checkUser()
+menu()
+
+
+while True:
+    item = str(input("SELECT A OPTION: "))
     if item == '0':
+        comport.close()
         break
     elif item == '1':
         print("Reading and inserting TEMPERATURE data into DB...")
@@ -107,3 +122,19 @@ while True:
     elif item == '7':
         print("Deletgin  ALL record data from DB...")
         deleteAllRecord();
+    elif item == '8':
+        os.system("clear")
+        menu()
+
+# SELECT * FROM arduinoproject.measures;
+# SELECT * FROM arduinoproject.environment;
+# SELECT * FROM arduinoproject.physical_quantity;
+# SELECT read_value FROM arduinoproject.measures;
+#
+#
+#
+# DELETE FROM arduinoproject.environment;
+# DELETE FROM arduinoproject.measures;
+# DELETE FROM arduinoproject.physical_quantity;
+#
+# UPDATE arduinoproject.physical_quantity SET description='Humidity' WHERE id=2;

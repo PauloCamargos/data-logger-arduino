@@ -6,11 +6,13 @@ def main():
     banco = Banco('projects','arduinoproject','postgres','banco')
     # Cria conexao:
     banco.connection();
-    # banco.insertDataInto(table='physical_quantity', description='temperature', unity='oC')
+    banco.insertDataInto(table='physical_quantity', description='Temperature', unity='oC')
+    banco.insertDataInto(table='physical_quantity', description='Umidty', unity='%')
     # banco.insertDataInto(table='environment', description='soil')
-    banco.deleteDataFrom(table='physical_quantity', condition='id', condition_value='4')
-
-    banco.selectAllDataFrom(table='physical_quantity')
+    # banco.insertDataInto(table='environment', description='water')
+    # banco.insertDataInto(table='environment', description='air')
+    # banco.deleteDataFrom(table='physical_quantity', condition='id', condition_value='4')
+    # banco.selectAllDataFrom(table='physical_quantity')
     # banco.updateData(table='physical_quantity', condition='id', condition_value= '7', description='tensao', unity='volts')
 
 class Banco:
