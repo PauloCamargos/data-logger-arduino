@@ -3,6 +3,11 @@
 In this project we created a data logger using an Arduino board to store
 temperature and humidity from soil and ar into a database on localhost.
 
+## Hardware
+
+Montagem:
+![](docs/dht_11_connections.png)
+
 ## Instalando a biblioteca no python
 No seu terminal, digite:
 * **psycopg2**: `sudo apt-get install psycopg2`
@@ -28,8 +33,8 @@ Pacotes:
 
   Tipo | Informação | Finalizador
   ---- | ---------- | -----------
-  'U' | '29' | '\n'
-  'T' | '25.0' | '\n'
+  'U' | '29' | '\r\n'
+  'T' | '25.0' | '\r\n'
 
 Sendo 'U' o indicador que será enviado um valor de Umidade (porcentagem).
 E 'T' o indicador que será enviado um valor de Temperatura (graus celcius).

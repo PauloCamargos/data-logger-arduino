@@ -20,7 +20,8 @@
 ////////////////
 #define COMM_UMIDADE        'U'
 #define COMM_TEMPERATURA    'T'
-#define COMM_END            '\n'
+#define COMM_END_1          '\r'
+#define COMM_END_2          '\n'
 
 ////////////////
 //Global Data //
@@ -55,10 +56,12 @@ void loop(){
             case CMD_LER_DADOS:
             Serial.write(COMM_TEMPERATURA);
             Serial.print(fake_temp, 2);
-            Serial.write(COMM_END);
+            Serial.write(COMM_END_1);
+            Serial.write(COMM_END_2);
             Serial.write(COMM_UMIDADE);
             Serial.print(fake_umid, 2);
-            Serial.write(COMM_END);
+            Serial.write(COMM_END_1);
+            Serial.write(COMM_END_2);
             fake_temp += 2.5;
             fake_umid += 7.5;
             if(fake_umid > 90){
@@ -67,6 +70,7 @@ void loop(){
             if(fake_temp > 50){
                 fake_temp = 15;
             }
+            break;
         }
     }
 }
