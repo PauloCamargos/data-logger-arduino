@@ -18,7 +18,7 @@
 //Pinos //
 //////////
 #define PINO_UMIDIFICADOR  12
-#define DHTPIN A0 // pino que sensor esta conectado
+#define DHTPIN A1 // pino que sensor esta conectado
 #define DHTTYPE DHT11 // tipo de sensor
 
 /////////////
@@ -51,11 +51,9 @@ void loop() {
     switch (cmd_serial) {
       case CMD_LIGAR_UMIDIFICADOR:
         digitalWrite(PINO_UMIDIFICADOR, HIGH);
-//        Serial.print("ON");
         break;
       case CMD_DESLIGAR_UMIDIFICADOR:
         digitalWrite(PINO_UMIDIFICADOR, LOW);
-//        Serial.print("OFF");
         break;
       case CMD_LER_TEMPERATURA:
         read_temp = dht.readTemperature();
@@ -63,7 +61,7 @@ void loop() {
         break;
       case CMD_LER_UMIDADE:
         read_umid = dht.readHumidity();
-        Serial.print(String(read_umid, 2));
+        Serial.print(read_umid, 2);
         break;
     }
   }
