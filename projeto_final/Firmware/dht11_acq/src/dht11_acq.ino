@@ -51,7 +51,7 @@ DHT dht(DHTPIN, DHTTYPE);
 void setup(){
     Serial.begin(9600);
     pinMode(PINO_VENTILADOR, OUTPUT);
-    pinMode(COMM_TEMPERATURA, OUTPUT);
+    pinMode(PINO_IRRIGADOR, OUTPUT);
     dht.begin();
 }
 
