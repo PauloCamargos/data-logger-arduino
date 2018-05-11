@@ -10,6 +10,7 @@
 # Description:
 # ------------------------------------------------------------------------------
 import serial
+from threading import Thread, Event
 import serial.tools.list_ports as serial_tools
 from time import sleep
 from ctypes import c_short
@@ -73,6 +74,8 @@ class ArduinoHandler:
         self.serialPort = serial.Serial()
         self.serialPort.port = port_name
         self.serialPort.baudrate = baudrate
+        self.thread = None
+        self.waiter = Event()
 
     def open(self):
         """
@@ -130,16 +133,16 @@ class ArduinoHandler:
 
         # TODO: Se for usar o methodo read_all, colocar um timer.sleep
         # com o tempo maximo de resposta do sensor
-        sleep(0.5) # Aguarda o arduino responder
-
-        arduino_msg = self.serialPort.read_all()
-        arduino_msg1 = arduino_msg.split()[0]
-        arduino_msg2 = arduino_msg.split()[1]
+        #sleep(1) # Aguarda o arduino responder
+        #self.waiter.wait(1) # Aguarda o arduino responder
+        #arduino_msg = self.serialPort.read_all()
+        #arduino_msg1 = arduino_msg.split()[0]
+        #arduino_msg2 = arduino_msg.split()[1]
 
         #TODO: Usar estes comandos e tirar o time.sleep()
         # Setar timeout da conexão para o tempo maximo de resposta do sensor
-        # arduino_msg1 = self.serialPort.readline()
-        # arduino_msg2 = self.serialPort.readline()
+        arduino_msg1 = self.serialPort.readline()
+        arduino_msg2 = self.serialPort.readline()
 
         leituras = {}
 
@@ -157,6 +160,13 @@ class ArduinoHandler:
 
         return leituras
 
+    def print_readings(self):
+        print(self.get_readings_dict())
+
+    def get_readings_dict_threaded(self):
+        self.thread = Thread(target=self.print_readings())
+        self.thread.start()
+
     def __str__(self):
         return "ArduinoHandlerObject" +\
               "\n\tSerialPort: " + str(self.serial_tools_obj.device) +\
@@ -165,7 +175,7 @@ class ArduinoHandler:
 
 
 def test():
-    my_arduino_handler = ArduinoHandler(port_name='/dev/ttyUSB0')
+    my_arduino_handler = ArduinoHandler()
 
     def show_status():
         print(my_arduino_handler)
@@ -188,6 +198,7 @@ def test():
         print(ArduinoConstants.CMD_DESLIGAR_IRRIGADOR, ' - Desligar Irrigador')
         print('-------------------------------')
         print(ArduinoConstants.CMD_LER_DADOS, ' - Ler Dados dos Sensores')
+        print('0', ' - Ler Dados dos Sensores')
         print('-------------------------------')
 
         if sys.version_info.major == 2:
@@ -214,6 +225,8 @@ def test():
             my_arduino_handler.set_irrigator_state(False)
         elif ArduinoConstants.CMD_LER_DADOS in str_key:
             print(my_arduino_handler.get_readings_dict())
+        elif '0' in str_key:
+            my_arduino_handler.get_readings_dict_threaded()
 
 def main():
     test()
