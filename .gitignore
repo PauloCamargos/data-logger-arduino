@@ -1,3 +1,9 @@
+# Python Files
+*.pyc
+
+# Project files
+.idea
+
 # platformio files
 *.pioenvs
 *.piolibdeps
