@@ -7,9 +7,8 @@ def main():
     banco = Banco('projects','arduinoproject','postgres','banco')
     # Cria conexao:
     banco.connection();
-    banco.insertDataInto(table='physical_quantity', description='temperature', unity='oC')
-    # banco.insertDataInto(table='environment', description='soil')
-    banco.selectAllDataFrom(table='physical_quantity')
+    banco.insertDataInto(table='environment', description='soil')
+    banco.selectAllDataFrom(table='environment')
 
 
 class Banco:
@@ -62,7 +61,7 @@ class Banco:
             self.cur = self.con.cursor()
 
         except (Exception, psycopg2.DatabaseError) as error:
-            print("exception: " + error)
+            print("exception: " + str(error))
 
     def insertDataInto(self, table, **kwargs):
         """Inserts data into a table using the parameters as fields and it's
@@ -114,60 +113,7 @@ class Banco:
 
         self.con.commit()
 
-    def updateData(self, table, where, **kwargs ):
-        """Updates data of a table using the parameters as fields and it's
-        values as data to be updated.
-
-        Parameters
-        ----------
-        table : String
-            Table which the data will be updated.
-        **kwargs : String
-            Fields and values to be updated in the table. Use the template
-            fieldName='value' to pass the columns and values. Unlimited number of
-            parameters allowed here.
-
-        Returns
-        -------
-        void
-        """
-
-		fields = []
-        values = []
-		fields_values = []
-        self.query = "INSERT INTO " + self.schema + "." + table
-
-        for key in kwargs:
-			# Table's fields
-            fields.append(key);
-            # Table's values
-            values.append(kwargs[key])
-        
-		for i in range(len(fields)):
-			fields_values.append( str(fields[i]) + '=' + str(values[i]) ) 
-		
-		
-
-        # Reversing to keep fields and values in the right order
-        fields.reverse()
-        values.reverse()
-
-        # Converting the lists in string
-        knownFields = ", ".join(fields)
-        placehold = ', '.join(unknownValues)
-
-        if(len(values) == 1): # Case only one value is inserted
-            self.cur.execute("INSERT INTO " + self.schema + "." + table + "(" + knownFields + ") VALUES ('" + str(values[0]) + "')")
-        else:
-            knownValues = tuple(values)
-            self.query = "INSERT INTO " + self.schema + "." + table + "(" + knownFields + ") VALUES(" + placehold + ")"
-            print(self.query)
-            print(knownValues)
-            self.cur.executemany(self.query, knownValues)
-
-        self.con.commit()
-	
-	def selectDataFrom(self, table):
+    def selectDataFrom(self, table):
         """Selects one row data from the specified table.
 
         Parameters

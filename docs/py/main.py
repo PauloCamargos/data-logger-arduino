@@ -1,8 +1,8 @@
+# -*- coding: utf-8 -*-
 import database
 import time
 import serial
-#!-*- conding: utf8 -*-
-# coding: utf-8
+
 # Iniciando conexao serial
 #comport = serial.Serial('/dev/ttyUSB0', 9600, timeout=1) # Setando timeout 1s para a conexao
 
@@ -15,10 +15,13 @@ database.connection()
 
 
 def startSerial():
+    # NOTE: o pyserial ja abre a porta serial qnd se inicializa deste modo
     comport = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
     return comport
 
 def readUnity(PARAM_CARACTER):
+    # NOTE: para cada leitura ele esta abrindo e fechando a porta Serial
+    # Isso não é mto otimizado
     comport = startConnection();
     comport.write(PARAM_CARACTER)
     VALUE_SERIAL=comport.readline()
@@ -28,6 +31,8 @@ def readUnity(PARAM_CARACTER):
 
 # Option 1
 def readTemperature():
+    # NOTE: O arduino estã com código para ler os 2 valores ao mesmo tempo
+    # Ao receber o comando 'R'
     read_temperature = readUnity('T')
     #columns: id_user, id_envrmt, read_value
     database.insertDataInto(table='measures',id_user=id_loggedUser,read_value=read_temperature )
@@ -45,6 +50,7 @@ def readAll():
 #  Option 4
 def selectLastRecord():
     # TODO: implement fetchOne query
+
 
 # Option 5
 def selectAllRecord():
