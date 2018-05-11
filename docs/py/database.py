@@ -2,15 +2,16 @@ import psycopg2
 import time
 import serial
 
-
 def main():
     banco = Banco('projects','arduinoproject','postgres','banco')
     # Cria conexao:
     banco.connection();
-    banco.insertDataInto(table='physical_quantity', description='temperature', unity='oC')
+    # banco.insertDataInto(table='physical_quantity', description='temperature', unity='oC')
     # banco.insertDataInto(table='environment', description='soil')
-    banco.selectAllDataFrom(table='physical_quantity')
+    banco.deleteDataFrom(table='physical_quantity', condition='id', condition_value='4')
 
+    banco.selectAllDataFrom(table='physical_quantity')
+    # banco.updateData(table='physical_quantity', condition='id', condition_value= '7', description='tensao', unity='volts')
 
 class Banco:
     """Database class. Use this class to create connection e execute CRUD
@@ -103,18 +104,16 @@ class Banco:
         knownFields = ", ".join(fields)
         placehold = ', '.join(unknownValues)
 
-        if(len(values) == 1): # Case only one value is inserted
-            self.cur.execute("INSERT INTO " + self.schema + "." + table + "(" + knownFields + ") VALUES ('" + str(values[0]) + "')")
-        else:
-            knownValues = tuple(values)
-            self.query = "INSERT INTO " + self.schema + "." + table + "(" + knownFields + ") VALUES(" + placehold + ")"
-            print(self.query)
-            print(knownValues)
-            self.cur.executemany(self.query, knownValues)
+        # Converting known values in tuple
+        knownValues = tuple(values)
+        self.query = "INSERT INTO " + self.schema + "." + table + "(" + knownFields + ") VALUES(" + placehold + ")"
+        print(self.query)
+        print(knownValues)
 
+        self.cur.execute(self.query, knownValues)
         self.con.commit()
 
-    def updateData(self, table, where, **kwargs ):
+    def updateDataFrom(self, table, condition, condition_value, **parameters ):
         """Updates data of a table using the parameters as fields and it's
         values as data to be updated.
 
@@ -122,6 +121,10 @@ class Banco:
         ----------
         table : String
             Table which the data will be updated.
+        condition : String
+            Field record where data will be updated.
+        condition_value : String
+            Value record where data will be updated.
         **kwargs : String
             Fields and values to be updated in the table. Use the template
             fieldName='value' to pass the columns and values. Unlimited number of
@@ -132,80 +135,45 @@ class Banco:
         void
         """
 
-		fields = []
+        fields_values= " "
         values = []
-		fields_values = []
-        self.query = "INSERT INTO " + self.schema + "." + table
 
-        for key in kwargs:
-			# Table's fields
-            fields.append(key);
+        self.query = "UPDATE " + self.schema + "." + table
+
+        for key in parameters:
+            # Table's fields
+            fields_values += str(key) + "=%s,"
             # Table's values
-            values.append(kwargs[key])
-        
-		for i in range(len(fields)):
-			fields_values.append( str(fields[i]) + '=' + str(values[i]) ) 
-		
-		
+            values.append(parameters[key])
 
-        # Reversing to keep fields and values in the right order
-        fields.reverse()
-        values.reverse()
+        values.append(condition_value)
+        fields_values = fields_values[:-1]
+        knownValues = tuple(values)
 
-        # Converting the lists in string
-        knownFields = ", ".join(fields)
-        placehold = ', '.join(unknownValues)
+        self.query += " SET" + fields_values  + " WHERE " +condition+"=%s"
 
-        if(len(values) == 1): # Case only one value is inserted
-            self.cur.execute("INSERT INTO " + self.schema + "." + table + "(" + knownFields + ") VALUES ('" + str(values[0]) + "')")
-        else:
-            knownValues = tuple(values)
-            self.query = "INSERT INTO " + self.schema + "." + table + "(" + knownFields + ") VALUES(" + placehold + ")"
-            print(self.query)
-            print(knownValues)
-            self.cur.executemany(self.query, knownValues)
+        print(self.query)
+        print(knownValues)
 
-        self.con.commit()
-	
-	def selectDataFrom(self, table):
-        """Selects one row data from the specified table.
-
-        Parameters
-        ----------
-        table : String
-            Table name which data will be fetched.
-
-        Returns
-        -------
-        String
-            Value fetched from the query.
-        """
-
-        self.cur.execute('SELECT * FROM ' + self.schema + '.' + table)
-        data_output = self.cur.fetchone();
-        print(data_output)
-
-        return data_output
+        try:
+            self.cur.execute(self.query, knownValues)
+            self.con.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
 
     def selectAllDataFrom(self, table):
-        """Selects all data from the specified table.
-
-        Parameters
-        ----------
-        table : String
-            Table name which data will be fetched.
-
-        Returns
-        -------
-        String tuple
-            Values fetched from the query. Each tuple represents a row.
-        """
-        self.cur.execute('SELECT * FROM ' + self.schema + '.' + table)
+        self.cur.execute("SELECT * FROM " + self.schema + "."  + table + ";")
+        self.cur.fetchone()
         rows = self.cur.fetchall()
         for row in rows:
-            print row
+           print row[0], row[1], row[2]
 
-        return rows
+    def deleteDataFrom(self, table, condition, condition_value,):
+        self.query = "DELETE FROM " + self.schema + "."  + table + " WHERE " + condition + " = %s"
+        data = (condition_value)
+        self.cur.execute(self.query, data)
+        self.con.commit()
+        print(self.query)
 
     def closeConnecetion(self):
         """Closes the connection.
@@ -216,14 +184,6 @@ class Banco:
         """
 
         self.con.close()
-
-    def updataDataFrom(self, table):
-        pass
-        # TODO: Create update method
-
-    def deleteDataFrom(self, table):
-        pass
-        # TODO: Create delet method
 
 
 if __name__ == "__main__":

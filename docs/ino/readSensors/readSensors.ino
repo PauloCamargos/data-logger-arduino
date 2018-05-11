@@ -17,16 +17,13 @@
 //////////
 //Pinos //
 //////////
-#define PINO_VENTILADOR 13
 #define PINO_UMIDIFICADOR  12
-#define DHTPIN A1 // pino que sensor esta conectado
+#define DHTPIN A0 // pino que sensor esta conectado
 #define DHTTYPE DHT11 // tipo de sensor
 
 /////////////
 //Comandos //
 /////////////
-//#define CMD_LIGAR_VENTILADOR    'V'
-//#define CMD_DESLIGAR_VENTILADOR 'v'
 
 #define CMD_LIGAR_UMIDIFICADOR     'U'
 #define CMD_DESLIGAR_UMIDIFICADOR  'u'
@@ -35,23 +32,15 @@
 #define CMD_LER_UMIDADE             'H'
 
 ////////////////
-//Comunicação //
-////////////////
-//#define COMM_UMIDADE        'U'
-//#define COMM_TEMPERATURA    'T'
-//#define COMM_END_1          '\r'
-//#define COMM_END_2          '\n'
-
-////////////////
 //Global Data //
 ////////////////
 char cmd_serial;
 float read_temp, read_umid;
+
 DHT dht(DHTPIN, DHTTYPE); // dth(pino, tipo)
 
 void setup() {
   Serial.begin(9600);
-  pinMode(PINO_VENTILADOR, OUTPUT);
   pinMode(PINO_UMIDIFICADOR, OUTPUT);
   dht.begin();
 }
@@ -62,9 +51,11 @@ void loop() {
     switch (cmd_serial) {
       case CMD_LIGAR_UMIDIFICADOR:
         digitalWrite(PINO_UMIDIFICADOR, HIGH);
+//        Serial.print("ON");
         break;
       case CMD_DESLIGAR_UMIDIFICADOR:
         digitalWrite(PINO_UMIDIFICADOR, LOW);
+//        Serial.print("OFF");
         break;
       case CMD_LER_TEMPERATURA:
         read_temp = dht.readTemperature();
@@ -72,15 +63,8 @@ void loop() {
         break;
       case CMD_LER_UMIDADE:
         read_umid = dht.readHumidity();
-        Serial.print(read_umid, 2);
+        Serial.print(String(read_umid, 2));
         break;
-//      Serial.write(COMM_TEMPERATURA);
-//      Serial.write(COMM_END_1);
-//      Serial.write(COMM_END_2);
-//      Serial.write(COMM_UMIDADE);
-//      Serial.write(COMM_END_1);
-//      Serial.write(COMM_END_2);
-//        break;
     }
   }
 }

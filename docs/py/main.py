@@ -79,7 +79,7 @@ def menu():
     print('------------------------------------------\n')
 
 menu()
-
+        >>>
 while True:
     checkUser()
     item = str(input("SELECT A OPTION: "))
