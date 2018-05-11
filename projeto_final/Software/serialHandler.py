@@ -157,7 +157,7 @@ class ArduinoHandler:
         elif msg1_type == ArduinoConstants.COMM_UMIDADE:
             leituras['Umidade'] = msg1_info
             leituras['Temperatura'] = msg2_info
-
+        print(leituras)
         return leituras
 
     def print_readings(self):
