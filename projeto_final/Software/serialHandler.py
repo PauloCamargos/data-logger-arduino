@@ -127,10 +127,20 @@ class ArduinoHandler:
 
     def get_readings_dict(self):
         self.serialPort.write(ArduinoConstants.CMD_LER_DADOS)
-        sleep(0.1) # Aguarda o arduino responder
+
+        # TODO: Se for usar o methodo read_all, colocar um timer.sleep
+        # com o tempo maximo de resposta do sensor
+        sleep(0.5) # Aguarda o arduino responder
+
         arduino_msg = self.serialPort.read_all()
         arduino_msg1 = arduino_msg.split()[0]
         arduino_msg2 = arduino_msg.split()[1]
+
+        #TODO: Usar estes comandos e tirar o time.sleep()
+        # Setar timeout da conexão para o tempo maximo de resposta do sensor
+        # arduino_msg1 = self.serialPort.readline()
+        # arduino_msg2 = self.serialPort.readline()
+
         leituras = {}
 
         msg1_type = arduino_msg1[0]
