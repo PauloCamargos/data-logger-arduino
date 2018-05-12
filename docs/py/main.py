@@ -14,11 +14,11 @@ Authors
 References
 ----------
     1. http://initd.org/psycopg/docs/genindex.html
+    2. http://initd.org/psycopg/docs/
 """
-import database
-import time
-import serial
-import os
+import database  # postgresql database connection
+import serial  # serial communication
+import os  # os.system('clear')
 
 ################
 # Global Data: #

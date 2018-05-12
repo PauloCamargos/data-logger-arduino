@@ -1,30 +1,29 @@
 # -*- coding: utf-8 -*-
+"""Data-Logger-Arduino Main Application
+Project of the discipline of Database.
+This code handles the Database querys
 
-import psycopg2
-import time
-import serial
+GitHub: http://github.com/paulocamargos/data-logger-arduino
 
-"""
+Notes
+-----
 USED SQL:
- - INSERT
- - CREATE
- - DELETE
- - UPDATE
- - COUNT
+    * INSERT
+    * CREATE
+    * Delete_
+    * UPDATE_
+    * COUNT
+Authors
+-------
+    * Paulo
+    * Thiago
+References_
+----------
+    1. http://initd.org/psycopg/docs/genindex.html
+    2. http://initd.org/psycopg/docs/
 """
+import psycopg2  # PostgreSQL database adapter for Python
 
-def main():
-    banco = Banco('projects','arduinoproject','postgres','banco')
-    # Cria conexao:
-    banco.connection();
-    # banco.insertDataInto(table='physical_quantity', description='Temperature', unity='°C')
-    # banco.insertDataInto(table='physical_quantity', description='Umidty', unity='%')
-    # banco.insertDataInto(table='environment', description='soil')
-    # banco.insertDataInto(table='environment', description='water')
-    # banco.insertDataInto(table='environment', description='air')
-    # banco.deleteDataFrom(table='physical_quantity', condition='id', condition_value='4')
-    # banco.selectAllDataFrom(table='users')
-    # banco.updateData(table='physical_quantity', condition='id', condition_value= '7', description='tensao', unity='volts')
 
 class Banco:
     """Database class. Use this class to create connection e execute CRUD
@@ -44,9 +43,10 @@ class Banco:
         Port number which the database uses.
     host : type
         Database host address.
-    """
 
-    def __init__(self, database, schema, user, password, port=5432, host='localhost'):
+    """
+    def __init__(self, database, schema, user, password, port=5432,
+                 host='localhost'):
         self.database = database
         self.schema = schema
         self.user = user
@@ -64,8 +64,8 @@ class Banco:
         Returns
         -------
         void
-        """
 
+        """
         try:
             self.con = psycopg2.connect(database=self.database,
                                         user=self.user,
@@ -88,14 +88,14 @@ class Banco:
             Table which the data will be inserted.
         **kwargs : String
             Fields and values to be inserted in the table. Use the template
-            fieldName='value' to pass the columns and values. Ilimited number of
-            parameters allowed here.
+            fieldName='value' to pass the columns and values. Ilimited number
+            of parameters allowed here.
 
         Returns
         -------
         void
-        """
 
+        """
         fields = []
         values = []
         unknownValues = []
@@ -103,7 +103,7 @@ class Banco:
 
         for key in kwargs:
             # Table's fields
-            fields.append(key);
+            fields.append(key)
             # Table's values
             values.append(kwargs[key])
             # Placeholders
@@ -119,14 +119,16 @@ class Banco:
 
         # Converting known values in tuple
         knownValues = tuple(values)
-        self.query = "INSERT INTO " + self.schema + "." + table + "(" + knownFields + ") VALUES(" + placehold + ")"
-        # print(self.query)
-        # print(knownValues)
+        self.query = "INSERT INTO " + self.schema + "." + table \
+                     "(" + knownFields + ") " \
+                     "VALUES(" + placehold + ")"
+        # DEBUG: print(self.query)
+        # DEBUG: print(knownValues)
 
         self.cur.execute(self.query, knownValues)
         self.con.commit()
 
-    def updateDataFrom(self, table, condition, condition_value, **parameters ):
+    def updateDataFrom(self, table, condition, condition_value, **parameters):
         """Updates data of a table using the parameters as fields and it's
         values as data to be updated.
 
@@ -140,15 +142,15 @@ class Banco:
             Value record where data will be updated.
         **kwargs : String
             Fields and values to be updated in the table. Use the template
-            fieldName='value' to pass the columns and values. Unlimited number of
-            parameters allowed here.
+            fieldName='value' to pass the columns and values. Unlimited number
+            of parameters allowed here.
 
         Returns
         -------
         void
         """
 
-        fields_values= " "
+        fields_values = " "
         values = []
 
         self.query = "UPDATE " + self.schema + "." + table
@@ -163,10 +165,10 @@ class Banco:
         fields_values = fields_values[:-1]
         knownValues = tuple(values)
 
-        self.query += " SET" + fields_values  + " WHERE " +condition+"=%s"
+        self.query += " SET" + fields_values + " WHERE " + condition + "=%s"
 
-        # print(self.query)
-        # print(knownValues)
+        # DEBUG: print(self.query)
+        # DEBUG: print(knownValues)
 
         try:
             self.cur.execute(self.query, knownValues)
@@ -175,40 +177,44 @@ class Banco:
             print(error)
 
     def selectLastDataFrom(self, table):
-        self.query = "SELECT MAX(id) FROM " + self.schema + "."  + table
+        self.query = "SELECT MAX(id) FROM " + self.schema + "." + table
         self.cur.execute(self.query)
         id_last_record = (self.cur.fetchone(),)
-        self.query = "SELECT * FROM " + self.schema + "." + table + " WHERE id=%s"
+        self.query = "SELECT * FROM " + self.schema + "." + table \
+                     " WHERE id=%s"
         self.cur.execute(self.query, id_last_record)
         one_row_data = self.cur.fetchone()
         return one_row_data
 
     def selectAllDataFrom(self, table):
-        self.query = "SELECT * FROM " + self.schema + "."  + table + ";"
+        self.query = "SELECT * FROM " + self.schema + "." + table + ";"
         self.cur.execute(self.query)
         rows = self.cur.fetchall()
         return rows
 
     def deleteLastRecordFrom(self, table):
-        self.cur.execute("SELECT MAX(id) FROM " + self.schema + "."  + table)
+        self.cur.execute("SELECT MAX(id) FROM " + self.schema + "." + table)
         id_last_record = (self.cur.fetchone(),)
-        self.query = "DELETE FROM " + self.schema + "."  + table + " WHERE id=%s"
+        self.query = "DELETE FROM " + self.schema + "." + table\
+                     " WHERE id=%s"
         self.cur.execute(self.query, id_last_record)
         self.con.commit()
-        # print(self.query)
+        # DEBUG: print(self.query)
 
     def deleteAllDataFrom(self, table):
-        self.query = "DELETE FROM " + self.schema + "."  + table;
+        self.query = "DELETE FROM " + self.schema + "." + table
         self.cur.execute(self.query)
         self.con.commit()
 
     def visualizeByUser(self, user_id=None):
-        self.query = "SELECT m.id AS id_measure, u.usr_fullname , m.read_value, p.unity \
-        FROM arduinoproject.measures m \
-        INNER JOIN arduinoproject.users u ON m.id_user = u.id \
-        INNER JOIN arduinoproject.physical_quantity p ON m.id_pquantity = p.id"
+        self.query = "SELECT m.id AS \
+                      id_measure, u.usr_fullname , m.read_value, p.unity \
+                      FROM arduinoproject.measures m \
+                      INNER JOIN arduinoproject.users u ON m.id_user = u.id \
+                      INNER JOIN arduinoproject.physical_quantity p \
+                      ON m.id_pquantity = p.id"
         self.cur.execute(self.query)
-        rows = self.cur.fetchall();
+        rows = self.cur.fetchall()
         return rows
 
     def closeConnecetion(self):
@@ -218,8 +224,28 @@ class Banco:
         -------
         void
         """
-
         self.con.close()
+
+
+def main():
+    banco = Banco('projects', 'arduinoproject', 'postgres', 'banco')
+    # Cria conexao:
+    banco.connection()
+    # NOTE: One Time Configurations (utilize as linhas abaixo para configurar
+    # o banco de dados, é necessário realizar somentre na primeira execução)
+    # banco.insertDataInto(table='physical_quantity',
+    #                      description='Temperature', unity='°C')
+    # banco.insertDataInto(table='physical_quantity',
+    #                      description='Umidty', unity='%')
+    # banco.insertDataInto(table='environment', description='soil')
+    # banco.insertDataInto(table='environment', description='water')
+    # banco.insertDataInto(table='environment', description='air')
+    # banco.deleteDataFrom(table='physical_quantity',
+    #                      condition='id', condition_value='4')
+    # banco.selectAllDataFrom(table='users')
+    # banco.updateData(table='physical_quantity', condition='id',
+    #                  condition_value= '7', description='tensao',
+    #                  unity='volts')
 
 
 if __name__ == "__main__":
