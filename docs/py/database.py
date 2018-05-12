@@ -120,8 +120,8 @@ class Banco:
         # Converting known values in tuple
         knownValues = tuple(values)
         self.query = "INSERT INTO " + self.schema + "." + table + "(" + knownFields + ") VALUES(" + placehold + ")"
-        print(self.query)
-        print(knownValues)
+        # print(self.query)
+        # print(knownValues)
 
         self.cur.execute(self.query, knownValues)
         self.con.commit()
@@ -165,8 +165,8 @@ class Banco:
 
         self.query += " SET" + fields_values  + " WHERE " +condition+"=%s"
 
-        print(self.query)
-        print(knownValues)
+        # print(self.query)
+        # print(knownValues)
 
         try:
             self.cur.execute(self.query, knownValues)
@@ -174,10 +174,14 @@ class Banco:
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
-    def selectDataFrom(self, table):
-        self.cur.execute("SELECT * FROM " + self.schema + "." + table + ";")
+    def selectLastDataFrom(self, table):
+        self.query = "SELECT MAX(id) FROM " + self.schema + "."  + table
+        self.cur.execute(self.query)
+        id_last_record = (self.cur.fetchone(),)
+        self.query = "SELECT * FROM " + self.schema + "." + table + " WHERE id=%s"
+        self.cur.execute(self.query, id_last_record)
         one_row_data = self.cur.fetchone()
-        return row
+        return one_row_data
 
     def selectAllDataFrom(self, table):
         self.query = "SELECT * FROM " + self.schema + "."  + table + ";"
@@ -187,12 +191,11 @@ class Banco:
 
     def deleteLastRecordFrom(self, table):
         self.cur.execute("SELECT MAX(id) FROM " + self.schema + "."  + table)
-        id_last_record = self.cur.fetchone();
+        id_last_record = (self.cur.fetchone(),)
         self.query = "DELETE FROM " + self.schema + "."  + table + " WHERE id=%s"
-        data = (id_last_record,)
-        self.cur.execute(self.query, data)
+        self.cur.execute(self.query, id_last_record)
         self.con.commit()
-        print(self.query)
+        # print(self.query)
 
     def deleteAllDataFrom(self, table):
         self.query = "DELETE FROM " + self.schema + "."  + table;

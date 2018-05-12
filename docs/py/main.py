@@ -7,9 +7,15 @@ import time
 import serial
 import os
 
+def checkUser():
+    USER_ID = raw_input('>>> Insert your user ID: ')
+    return USER_ID
+
+
 UMIDITY_CARACTER='U'
 TEMP_CARACTER='T'
-USER_ID = 1
+USER_ID = checkUser();
+
 
 database = database.Banco('projects','arduinoproject','postgres','banco')
 database.connection()
@@ -25,39 +31,46 @@ def readUnity(PARAM_CARACTER):
 
 # Option 1
 def readTemperature():
+    print("Reading and inserting TEMPERATURE data into DB...")
     read_temperature = readUnity('T')
-    print("A temperatura lida é: " + str(read_temperature))
+    print("The read temperature is " + str(read_temperature))
     #columns: id_user, id_envrmt, read_value
     database.insertDataInto(table='measures',id_user=USER_ID, id_environment=1, id_pquantity=1, read_value=read_temperature)
+    print("Success! Data inserted into database.\n")
 
 # Option 2
 def readUmidity():
+    print("Reading and inserting UMIDITY data into DB...")
     read_umidity = readUnity('U')
-    print("A umidade lida é: " + read_umidity)
+    print("The read humidity is " + str(read_umidity))
     #columns: id_user, id_envrmt, read_value
     database.insertDataInto(table='measures',id_user=USER_ID, id_environment=1,  id_pquantity=2, read_value=read_umidity)
-
+    print("Success! Data inserted into database.\n")
 
 # Option 3
 def readAll():
+    print("Reading and inserting temperature and humidity into database...")
     read_temperature = readUnity('T')
     read_umidity = readUnity('U')
-    print("Temperatura: " + read_temperature)
-    print("Umidade: " + read_umidity)
-
+    print("Success! Temperature and humidity inserted into database.\n")
+    # print("Temperatura: " + read_temperature)
+    # print("Umidade: " + read_umidity)
 
 #  Option 4
 def selectLastRecord(table):
-    last_db_data = database.selectDataFrom(table)
+    print("Fetching last record from table '" + table + "'")
+    last_db_data = database.selectLastDataFrom(table)
     print(last_db_data)
+    print("--------- \n")
+
 
 # Option 5
 def selectAllRecord(table):
+    print("Fetching last record from table '" + table + "'")
     rows = database.selectAllDataFrom(table)
     for row in rows:
         print row
     print("--------- \n")
-
 
 def deleteLastRecord(table):
     ans = str(raw_input("You are about to delete THE LAST record from the table '" + table +"'. ARE YOU SURE? (y/n) "))
@@ -70,7 +83,6 @@ def deleteLastRecord(table):
         print("Canceled operation. Returning to menu...")
         print("----------")
 
-
 def deleteAllRecord(table):
     ans = str(raw_input("You are about to delete ALL record from the table '" + table + "'. ARE YOU SURE? (y/n) "))
     if ans == 'y' or ans == 'yes':
@@ -79,12 +91,6 @@ def deleteAllRecord(table):
         print("Finished operation. Table cleared.")
     else:
         print("Canceled operation. Returning to menu...")
-
-
-def checkUser():
-    USER_ID = raw_input('>>> Insert your user ID: ')
-    return USER_ID
-
 
 def menu():
     print('\n--------------- MENU -----------------------')
@@ -99,37 +105,30 @@ def menu():
     print('8 - Limpar tela')
     print('--------------------------------------------\n')
 
-
-checkUser()
 menu()
-
 
 while True:
     item = str(raw_input(">>> SELECT A OPTION: "))
-    if item == '0':
+    if item == '0' or item == 'q':
         comport.close()
         break
     elif item == '1':
-        print("Reading and inserting TEMPERATURE data into DB...")
         readTemperature();
     elif item == '2':
-        print("Reading and inserting UMIDITY data into DB...")
         readUmidity();
     elif item == '3':
-        print("Reading and inserting ALL data into DB...")
         readAll();
     elif item == '4':
-        print("Searching LAST record data from DB...")
-        selectLastRecord();
+        table = str(raw_input("> Enter table name: "))
+        selectLastRecord(table);
     elif item == '5':
-        table = str(raw_input("Enter table name: "))
-        print("Searching ALL record data from DB...")
+        table = str(raw_input("> Enter table name: "))
         selectAllRecord(table);
     elif item == '6':
-        table = str(raw_input("You are about to delete data from a table. Enter table name: "))
+        table = str(raw_input("> You are about to delete data from a table. Enter table name: "))
         deleteLastRecord(table);
     elif item == '7':
-        table = str(raw_input("You are about to delete ALL data from a table. Enter table name: "))
+        table = str(raw_input("> You are about to delete ALL data from a table. Enter table name: "))
         deleteAllRecord(table);
     elif item == '8':
         os.system('cls' if os.name == 'nt' else 'clear')
