@@ -139,7 +139,7 @@ while True:
         table = str(raw_input("> You are about to delete ALL data from a table. Enter table name: "))
         deleteAllRecord(table);
     elif item == '8':
-        visualizeByUser(USER_ID);
+        visualizeByUser();
     elif item == 'C' or item == 'c':
         os.system('cls' if os.name == 'nt' else 'clear')
         menu()

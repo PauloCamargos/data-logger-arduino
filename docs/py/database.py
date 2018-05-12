@@ -207,7 +207,7 @@ class Banco:
         FROM arduinoproject.measures m \
         INNER JOIN arduinoproject.users u ON m.id_user = u.id \
         INNER JOIN arduinoproject.physical_quantity p ON m.id_pquantity = p.id"
-        self.cur = execute(self.query)
+        self.cur.execute(self.query)
         rows = self.cur.fetchall();
         return rows
 
