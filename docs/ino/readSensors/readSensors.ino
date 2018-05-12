@@ -24,7 +24,7 @@
 /////////////
 //Comandos //
 /////////////
-
+  
 #define CMD_LIGAR_UMIDIFICADOR     'U'
 #define CMD_DESLIGAR_UMIDIFICADOR  'u'
 
@@ -57,11 +57,13 @@ void loop() {
         break;
       case CMD_LER_TEMPERATURA:
         read_temp = dht.readTemperature();
-        Serial.print(read_temp, 2);
+//        if(isnan(read_temp/))
+          Serial.println(read_temp, 2);
         break;
       case CMD_LER_UMIDADE:
         read_umid = dht.readHumidity();
-        Serial.print(read_umid, 2);
+//         if(isnan(read_umid))/
+           Serial.println(read_umid, 2);
         break;
     }
   }

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Data-Logger-Arduino Main Application
 Project of the discipline of Database.
@@ -18,13 +19,19 @@ References
 """
 import database  # postgresql database connection
 import serial  # serial communication
+import time #time.sleep(int)
 import os  # os.system('clear')
+import math
 
 ################
 # Global Data: #
 ################
-
-
+HUMIDITY_CHARACTER = 'H'
+TEMP_CHARACTER = 'T'
+database = database.Banco('projects', 'arduinoproject',
+                          'postgres', 'banco')
+database.connection()
+comport = serial.Serial('/dev/ttyACM2', 9600, timeout=3)
 def checkUser():
     """Asks the user for input the USER_ID
 
@@ -34,17 +41,12 @@ def checkUser():
         USER_ID inserted by the user.
 
     """
-    USER_ID = raw_input('>>> Insert your user ID: ')
-    return USER_ID
+    username_value = str(raw_input('>>> Insert your username: '))
+    user = database.selectDataWhere('users', 'username', username_value, 'id', 'usr_fullname')
+    return user
 
+USER_ID, USER_FULLNAME = checkUser()
 
-HUMIDITY_CARACTER = 'U'
-TEMP_CARACTER = 'T'
-USER_ID = raw_input('>>> Insert your user ID: ')
-database = database.Banco('projects', 'arduinoproject',
-                          'postgres', 'banco')
-database.connection()
-comport = serial.Serial('/dev/ttyACM0', 9600, timeout=3)
 
 ##########################
 # Application Functions: #
@@ -78,7 +80,11 @@ def readUnity(PARAM_CARACTER):
 
     """
     comport.write(PARAM_CARACTER)
+    time.sleep(1.8)
     VALUE_SERIAL = float(comport.readline())
+    # Case read value is nan
+    if math.isnan(VALUE_SERIAL):
+        VALUE_SERIAL = -1
     # DEBUG: Uncomment here for debbuging
     # print '%s. Retorno da serial: %s' % (PARAM_CARACTER, VALUE_SERIAL)
     return VALUE_SERIAL
@@ -99,13 +105,17 @@ def readTemperature():
 
     """
     print("Reading and inserting TEMPERATURE data into DB...")
-    read_temperature = readUnity('T')
-    print("The read temperature is " + str(read_temperature) + "ºC.")
-    # columns: id_user, id_envrmt, read_value
-    database.insertDataInto(table='measures', id_user=USER_ID,
-                            id_environment=1, id_pquantity=1,
-                            read_value=read_temperature)
-    print("Success! Data inserted into database.\n")
+    read_temperature = readUnity(TEMP_CHARACTER)
+
+    if read_temperature != -1:
+        print("The read temperature is " + str(read_temperature) + "ºC.")
+        # columns: id_user, id_envrmt, read_value
+        database.insertDataInto(table='measures', id_user=USER_ID,
+                                id_environment=1, id_pquantity=1,
+                                read_value=read_temperature)
+        print("Success! Data inserted into database.\n")
+    else:
+        print("Failed to read temperature. Try again in 5 seconds.")
 
 
 def readHumidity():
@@ -123,13 +133,16 @@ def readHumidity():
 
     """
     print("Reading and inserting HUMIDITY data into DB...")
-    read_humidity = readUnity('U')
-    print("The read humidity is " + str(read_humidity))
-    # columns: id_user, id_envrmt, read_value
-    database.insertDataInto(table='measures', id_user=USER_ID,
-                            id_environment=1, id_pquantity=2,
-                            read_value=read_humidity)
-    print("Success! Data inserted into database.\n")
+    read_humidity = readUnity(HUMIDITY_CHARACTER)
+    if read_humidity != -1:
+        print("The read humidity is " + str(read_humidity) + "%")
+        # columns: id_user, id_envrmt, read_value
+        database.insertDataInto(table='measures', id_user=USER_ID,
+                                id_environment=1, id_pquantity=2,
+                                read_value=read_humidity)
+        print("Success! Data inserted into database.\n")
+    else:
+        print("Failed to read temperature. Try again in 5 seconds.")
 
 
 def readAll():
@@ -145,11 +158,10 @@ def readAll():
         Success! Temperature and humidity inserted into database.
 
     """
-    print("Reading and inserting temperature and humidity into database...")
-    read_temperature = readUnity('T')
-    read_humidity = readUnity('U')
+    print("Reading and inserting temperature and humidity into database...\n")
+    readTemperature()
+    readHumidity()
     print("Success! Temperature and humidity inserted into database.\n")
-    # TODO: Esta função lê os dados mas não fazer nada, ué?
     # DEBUG: Uncomment here for debbuging
     # print("Temperatura: " + read_temperature)
     # print("Umidade: " + read_humidity)
@@ -189,14 +201,17 @@ def selectAllRecord(table):
     Example
     -------
         >>> selectAllRecord('measures')
-        Fetching all records from table 'measures'.
+        Fetching all records from table 'measures'...
 
     """
     # TODO: Terminar o exemplo na documentação
     print("Fetching all records from table '" + table + "'")
     rows = database.selectAllDataFrom(table)
-    for row in rows:
-        print row
+    if rows:
+        for row in rows:
+            print row
+    else:
+        print("No data found!")
     print("--------- \n")
 
 
@@ -219,17 +234,12 @@ def deleteLastRecord(table):
         Finished operation. Table cleared.
 
     """
-    ans = str(raw_input("You are about to delete THE LAST " +
-                        "record from the table '" + table +
-                        "'.\nARE YOU SURE? (y/n) "))
-    if ans == 'y' or ans == 'yes':
-        print("Deleting last record from " + table)
-        database.deleteLastRecordFrom(table)
-        print("Finished operation. Table cleared.\n")
-        print("--------- \n")
-    else:
-        print("Canceled operation. Returning to menu...")
-        print("--------- \n")
+
+    print("Deleting last record from " + table)
+    database.deleteLastRecordFrom(table)
+    print("Finished operation. Table cleared.\n")
+    print("--------- \n")
+
 
 
 def deleteAllRecord(table):
@@ -251,15 +261,10 @@ def deleteAllRecord(table):
         Finished operation. Table cleared.
 
     """
-    ans = str(raw_input("You are about to delete ALL " +
-                        "records from the table '" + table +
-                        "'.\nARE YOU SURE? (y/n) "))
-    if ans == 'y' or ans == 'yes':
-        print("Deleting all records from " + table)
-        database.deleteAllDataFrom(table)
-        print("Finished operation. Table cleared.")
-    else:
-        print("Canceled operation. Returning to menu...")
+    print("Deleting all records from " + table)
+    database.deleteAllDataFrom(table)
+    print("Finished operation. Table cleared.")
+    print("--------- \n")
 
 
 def visualizeByUser():
@@ -273,29 +278,33 @@ def visualizeByUser():
     # TODO: finish docummentation
     print("Fetching all insertions by user...")
     rows = database.visualizeByUser()
-    for row in rows:
-        print row
+    if rows:
+        for row in rows:
+            print row
+    else:
+        print("No data found!")
     print("--------- \n")
 
+print("########### SEJA MUITO BEM-VINDO, " + USER_FULLNAME+ " ###########")
 
 def menu():
     """Shows a menu with the Application Options.
     This function only shows the menu, you still need to gets the user inputs.
 
     """
-    print('\n--------------- MENU -----------------------')
-    print('0 - EXIT PROGRAM')
-    print('1 - Read temperature')
-    print('2 - Read humidity')
-    print('3 - Read both (temp. and umid.)')
-    print('4 - Visualize the last record')
-    print('5 - Visualize all record')
-    print('6 - Delete last record')
-    print('7 - Delete all record')
-    print('8 - Visualize insertions by user')
-    print('C - Limpar tela')
-    print('--------------------------------------------\n')
-
+    print('\n----------------------------- MENU ------------------------------')
+    print('0 - EXIT PROGRAM                     |    10 - * Create user infos')
+    print('1 - Read temperature                 |    11 - * Check users info')
+    print('2 - Read humidity                    |    12 - * Update user infos')
+    print('3 - Read both (temp. and umid.)      |    13 - * Remove user')
+    print('4 - Visualize the last record        |    14 - *')
+    print('5 - Visualize all record             |    15 - *')
+    print('6 - Delete last record               |    16 - *')
+    print('7 - Delete all record                |    17 - *')
+    print('8 - Visualize insertions by user     |    18 - *')
+    print('C - Limpar tela                      |    19 - *')
+    print('-----------------------------------------------------------------\n')
+    # * to be implemented
 
 def main():
     """Main Application
@@ -303,7 +312,7 @@ def main():
     menu()
 
     while True:
-        item = str(raw_input(">>> SELECT A OPTION: "))
+        item = str(raw_input(">>> SELECT AN OPTION: "))
         if item == '0' or item == 'q':
             comport.close()
             break
@@ -319,21 +328,34 @@ def main():
         elif item == '5':
             table = str(raw_input("> Enter table name: "))
             selectAllRecord(table)
+
         elif item == '6':
-            table = str(raw_input("> You are about to delete data " +
-                                  "from a table. Enter table name: "))
-            deleteLastRecord(table)
+            ans = str(raw_input("You are about to delete the LAST " +
+                                "record of a table.\nARE YOU SURE? (y/n) "))
+            if ans == 'y' or ans == 'yes':
+                table = str(raw_input("> Enter the table's name: "))
+                deleteLastRecord(table)
+            else:
+                print("Operation aborted. Returning to menu...")
+                print("--------- \n")
+
         elif item == '7':
-            table = str(raw_input("> You are about to delete ALL data " +
-                                  "from a table. Enter table name: "))
-            deleteAllRecord(table)
+            ans = str(raw_input("> You are about to delete the ALL data " +
+                                  "of a table. \nARE YOU SURE? (yes/no) "))
+            if ans == 'y' or ans == 'yes':
+                table = str(raw_input("> Enter the table's name: "))
+                deleteAllRecord(table)
+            else:
+                print("Operation aborted. Returning to menu...")
+                print("--------- \n")
+
         elif item == '8':
             visualizeByUser()
         elif item == 'C' or item == 'c':
             os.system('cls' if os.name == 'nt' else 'clear')
             menu()
         else:
-            print("Invalid option! Choose one option from the menu above.")
+            print("Invalid option! Choose one option from the menu above.\n")
 
 
 if __name__ == '__main__':

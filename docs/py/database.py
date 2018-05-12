@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Data-Logger-Arduino Main Application
 Project of the discipline of Database.
@@ -12,11 +13,13 @@ USED SQL:
     * CREATE
     * Delete_
     * UPDATE_
-    * COUNT
+    * MAX
+    * INNER JOIN_
 Authors
 -------
     * Paulo
     * Thiago
+    * Italo
 References_
 ----------
     1. http://initd.org/psycopg/docs/genindex.html
@@ -41,7 +44,7 @@ class Banco:
         User's password to access the database.
     port : int
         Port number which the database uses.
-    host : type
+    host : String
         Database host address.
 
     """
@@ -113,15 +116,15 @@ class Banco:
         fields.reverse()
         values.reverse()
 
-        # Converting the lists in string
+        # Converting the lists into string
         knownFields = ", ".join(fields)
         placehold = ', '.join(unknownValues)
 
-        # Converting known values in tuple
+        # Converting known values into a tuple
         knownValues = tuple(values)
         self.query = "INSERT INTO " + self.schema + "." + table \
-                     "(" + knownFields + ") " \
-                     "VALUES(" + placehold + ")"
+                     + "(" + knownFields + ") " \
+                     + "VALUES(" + placehold + ")"
         # DEBUG: print(self.query)
         # DEBUG: print(knownValues)
 
@@ -176,37 +179,116 @@ class Banco:
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
+    def selectDataWhere(self, table, condition, condition_value, *args):
+        fields = " "
+        for arg in args:
+            fields += arg + ", "
+
+        fields = fields[:-2]
+
+        self.query = "SELECT " + fields + " FROM " + self.schema + "." + table \
+                    + " WHERE " + condition + "=%s"
+
+        condition_value = (condition_value ,)
+        self.cur.execute(self.query, condition_value)
+        row = self.cur.fetchone()
+        return row
+
     def selectLastDataFrom(self, table):
+        """Selects the last record from a specified table.
+
+        Parameters
+        ----------
+        table : String
+            Table's name from which last record will be retrieved and returned
+
+        Returns
+        -------
+        tuple
+            Returns a single tuple with the last row of a table.
+
+        """
         self.query = "SELECT MAX(id) FROM " + self.schema + "." + table
         self.cur.execute(self.query)
         id_last_record = (self.cur.fetchone(),)
         self.query = "SELECT * FROM " + self.schema + "." + table \
-                     " WHERE id=%s"
+                    + " WHERE id=%s"
         self.cur.execute(self.query, id_last_record)
         one_row_data = self.cur.fetchone()
         return one_row_data
 
     def selectAllDataFrom(self, table):
+        """Selects all data from a specified table.
+
+        Parameters
+        ----------
+        table : String
+            Table's name from which all data will be retrieved and returned.
+
+        Returns
+        -------
+        Tuple
+            Return a tuple containing all data from a table, each onde inside a
+            tuple.
+
+        """
         self.query = "SELECT * FROM " + self.schema + "." + table + ";"
         self.cur.execute(self.query)
         rows = self.cur.fetchall()
         return rows
 
     def deleteLastRecordFrom(self, table):
+        """Deletes the last record from a specified table.
+
+        Parameters
+        ----------
+        table : String
+            Table's name of which the last record will be deleted. This action is irreversible.
+
+        Returns
+        -------
+        void
+        """
         self.cur.execute("SELECT MAX(id) FROM " + self.schema + "." + table)
         id_last_record = (self.cur.fetchone(),)
-        self.query = "DELETE FROM " + self.schema + "." + table\
-                     " WHERE id=%s"
+        self.query = "DELETE FROM " + self.schema + "." + table \
+                     + " WHERE id=%s"
         self.cur.execute(self.query, id_last_record)
         self.con.commit()
         # DEBUG: print(self.query)
 
     def deleteAllDataFrom(self, table):
+        """Deletes all data from a specified table.
+
+        Parameters
+        ----------
+        table : String
+            Table's name of which all data will be deleted. This action is irreversible.
+
+        Returns
+        -------
+        void
+        """
         self.query = "DELETE FROM " + self.schema + "." + table
         self.cur.execute(self.query)
         self.con.commit()
 
     def visualizeByUser(self, user_id=None):
+        """Selects the id of a mesure, it's value and it's unity and the name of the user who
+        registered the data. User id is optional. If not passed, returns all records.
+
+        Parameters
+        ----------
+        user_id (optional): Int
+            User id whom database associated records will be retrieved. If not passed, all records
+            will be retrieved and returned.
+
+        Returns
+        -------
+        Tuple
+            Returns a tuple of tupes. Each tuple is a record retrieved.
+
+        """
         self.query = "SELECT m.id AS \
                       id_measure, u.usr_fullname , m.read_value, p.unity \
                       FROM arduinoproject.measures m \
