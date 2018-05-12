@@ -202,6 +202,14 @@ class Banco:
         self.cur.execute(self.query)
         self.con.commit()
 
+    def visualizeByUser(self, user_id=None):
+        self.query = "SELECT m.id AS id_measure, u.usr_fullname , m.read_value, p.unity \
+        FROM arduinoproject.measures m \
+        INNER JOIN arduinoproject.users u ON m.id_user = u.id \
+        INNER JOIN arduinoproject.physical_quantity p ON m.id_pquantity = p.id"
+        self.cur = execute(self.query)
+        rows = self.cur.fetchall();
+        return rows
 
     def closeConnecetion(self):
         """Closes the connection.

@@ -78,10 +78,10 @@ def deleteLastRecord(table):
         print("Deleting last record from " + table)
         database.deleteLastRecordFrom(table)
         print("Finished operation. Table cleared.\n")
-        print("----------")
+        print("--------- \n")
     else:
         print("Canceled operation. Returning to menu...")
-        print("----------")
+        print("--------- \n")
 
 def deleteAllRecord(table):
     ans = str(raw_input("You are about to delete ALL record from the table '" + table + "'. ARE YOU SURE? (y/n) "))
@@ -91,6 +91,13 @@ def deleteAllRecord(table):
         print("Finished operation. Table cleared.")
     else:
         print("Canceled operation. Returning to menu...")
+
+def visualizeByUser():
+    print("Fetching all insertions by user...")
+    rows = database.visualizeByUser()
+    for row in rows:
+        print row
+    print("--------- \n")
 
 def menu():
     print('\n--------------- MENU -----------------------')
@@ -102,7 +109,8 @@ def menu():
     print('5 - Visualize all record')
     print('6 - Delete last record')
     print('7 - Delete all record')
-    print('8 - Limpar tela')
+    print('8 - Visualize insertions by user')
+    print('C - Limpar tela')
     print('--------------------------------------------\n')
 
 menu()
@@ -131,6 +139,8 @@ while True:
         table = str(raw_input("> You are about to delete ALL data from a table. Enter table name: "))
         deleteAllRecord(table);
     elif item == '8':
+        visualizeByUser(USER_ID);
+    elif item == 'C' or item == 'c':
         os.system('cls' if os.name == 'nt' else 'clear')
         menu()
     else:
