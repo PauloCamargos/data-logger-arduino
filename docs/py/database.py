@@ -1,18 +1,29 @@
+# -*- coding: utf-8 -*-
+
 import psycopg2
 import time
 import serial
+
+"""
+USED SQL:
+ - INSERT
+ - CREATE
+ - DELETE
+ - UPDATE
+ - COUNT
+"""
 
 def main():
     banco = Banco('projects','arduinoproject','postgres','banco')
     # Cria conexao:
     banco.connection();
-    banco.insertDataInto(table='physical_quantity', description='Temperature', unity='oC')
-    banco.insertDataInto(table='physical_quantity', description='Umidty', unity='%')
+    # banco.insertDataInto(table='physical_quantity', description='Temperature', unity='°C')
+    # banco.insertDataInto(table='physical_quantity', description='Umidty', unity='%')
     # banco.insertDataInto(table='environment', description='soil')
     # banco.insertDataInto(table='environment', description='water')
     # banco.insertDataInto(table='environment', description='air')
     # banco.deleteDataFrom(table='physical_quantity', condition='id', condition_value='4')
-    # banco.selectAllDataFrom(table='physical_quantity')
+    # banco.selectAllDataFrom(table='users')
     # banco.updateData(table='physical_quantity', condition='id', condition_value= '7', description='tensao', unity='volts')
 
 class Banco:
@@ -163,19 +174,31 @@ class Banco:
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
-    def selectAllDataFrom(self, table):
-        self.cur.execute("SELECT * FROM " + self.schema + "."  + table + ";")
-        self.cur.fetchone()
-        rows = self.cur.fetchall()
-        for row in rows:
-           print row[0], row[1], row[2]
+    def selectDataFrom(self, table):
+        self.cur.execute("SELECT * FROM " + self.schema + "." + table + ";")
+        one_row_data = self.cur.fetchone()
+        return row
 
-    def deleteDataFrom(self, table, condition, condition_value,):
-        self.query = "DELETE FROM " + self.schema + "."  + table + " WHERE " + condition + " = %s"
-        data = (condition_value)
+    def selectAllDataFrom(self, table):
+        self.query = "SELECT * FROM " + self.schema + "."  + table + ";"
+        self.cur.execute(self.query)
+        rows = self.cur.fetchall()
+        return rows
+
+    def deleteLastRecordFrom(self, table):
+        self.cur.execute("SELECT MAX(id) FROM " + self.schema + "."  + table)
+        id_last_record = self.cur.fetchone();
+        self.query = "DELETE FROM " + self.schema + "."  + table + " WHERE id=%s"
+        data = (id_last_record,)
         self.cur.execute(self.query, data)
         self.con.commit()
         print(self.query)
+
+    def deleteAllDataFrom(self, table):
+        self.query = "DELETE FROM " + self.schema + "."  + table;
+        self.cur.execute(self.query)
+        self.con.commit()
+
 
     def closeConnecetion(self):
         """Closes the connection.

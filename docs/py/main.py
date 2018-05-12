@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+
+# http://initd.org/psycopg/docs/genindex.html
+
 import database
 import time
 import serial
 import os
-# Iniciando conexao serial
-#comport = serial.Serial('/dev/ttyUSB0', 9600, timeout=1) # Setando timeout 1s para a conexao
 
 UMIDITY_CARACTER='U'
 TEMP_CARACTER='T'
@@ -12,13 +13,7 @@ USER_ID = 1
 
 database = database.Banco('projects','arduinoproject','postgres','banco')
 database.connection()
-
-
-# def startSerial():
-#     # NOTE: o pyserial ja abre a porta serial qnd se inicializa deste modo
-#
-#     return comport
-comport = serial.Serial('/dev/ttyACM0', 9600, timeout=4)
+comport = serial.Serial('/dev/ttyACM0', 9600, timeout=3)
 
 def readUnity(PARAM_CARACTER):
     # NOTE: para cada leitura ele esta abrindo e fechando a porta Serial
@@ -33,14 +28,14 @@ def readTemperature():
     read_temperature = readUnity('T')
     print("A temperatura lida é: " + str(read_temperature))
     #columns: id_user, id_envrmt, read_value
-    database.insertDataInto(table='measures',id_user=USER_ID, id_envrmt=1, read_value=read_temperature)
+    database.insertDataInto(table='measures',id_user=USER_ID, id_environment=1, id_pquantity=1, read_value=read_temperature)
 
 # Option 2
 def readUmidity():
     read_umidity = readUnity('U')
     print("A umidade lida é: " + read_umidity)
     #columns: id_user, id_envrmt, read_value
-    database.insertDataInto(table='measures',id_user=USER_ID, id_envrmt=1, read_value=read_temperature )
+    database.insertDataInto(table='measures',id_user=USER_ID, id_environment=1,  id_pquantity=2, read_value=read_umidity)
 
 
 # Option 3
@@ -52,34 +47,47 @@ def readAll():
 
 
 #  Option 4
-def selectLastRecord():
-    pass
-    # TODO: implement fetchOne query
-
+def selectLastRecord(table):
+    last_db_data = database.selectDataFrom(table)
+    print(last_db_data)
 
 # Option 5
-def selectAllRecord():
-    pass
-    # TODO: implement fetchall query
+def selectAllRecord(table):
+    rows = database.selectAllDataFrom(table)
+    for row in rows:
+        print row
+    print("--------- \n")
 
 
-def deleteLastRecord():
-    pass
-    # TODO: implement delete query
+def deleteLastRecord(table):
+    ans = str(raw_input("You are about to delete THE LAST record from the table '" + table +"'. ARE YOU SURE? (y/n) "))
+    if ans == 'y' or ans == 'yes':
+        print("Deleting last record from " + table)
+        database.deleteLastRecordFrom(table)
+        print("Finished operation. Table cleared.\n")
+        print("----------")
+    else:
+        print("Canceled operation. Returning to menu...")
+        print("----------")
 
 
-def deleteAllRecord():
-    pass
-    # TODO: impolement delete all query
+def deleteAllRecord(table):
+    ans = str(raw_input("You are about to delete ALL record from the table '" + table + "'. ARE YOU SURE? (y/n) "))
+    if ans == 'y' or ans == 'yes':
+        print("Deleting all records from " + table)
+        database.deleteAllDataFrom(table)
+        print("Finished operation. Table cleared.")
+    else:
+        print("Canceled operation. Returning to menu...")
 
 
 def checkUser():
-    USER_ID = input('Insert your user ID: ')
+    USER_ID = raw_input('>>> Insert your user ID: ')
     return USER_ID
 
 
 def menu():
-    print('--------------- MENU -----------------------')
+    print('\n--------------- MENU -----------------------')
     print('0 - EXIT PROGRAM')
     print('1 - Read temperature')
     print('2 - Read umidity')
@@ -89,7 +97,7 @@ def menu():
     print('6 - Delete last record')
     print('7 - Delete all record')
     print('8 - Limpar tela')
-    print('------------------------------------------\n')
+    print('--------------------------------------------\n')
 
 
 checkUser()
@@ -97,7 +105,7 @@ menu()
 
 
 while True:
-    item = str(input("SELECT A OPTION: "))
+    item = str(raw_input(">>> SELECT A OPTION: "))
     if item == '0':
         comport.close()
         break
@@ -111,30 +119,20 @@ while True:
         print("Reading and inserting ALL data into DB...")
         readAll();
     elif item == '4':
-        print("Searching  LAST record data from DB...")
+        print("Searching LAST record data from DB...")
         selectLastRecord();
     elif item == '5':
-        print("Searching  ALL record data from DB...")
-        selectAllRecord();
+        table = str(raw_input("Enter table name: "))
+        print("Searching ALL record data from DB...")
+        selectAllRecord(table);
     elif item == '6':
-        print("Deleting  LAST record data from DB...")
-        deleteLastRecord();
+        table = str(raw_input("You are about to delete data from a table. Enter table name: "))
+        deleteLastRecord(table);
     elif item == '7':
-        print("Deletgin  ALL record data from DB...")
-        deleteAllRecord();
+        table = str(raw_input("You are about to delete ALL data from a table. Enter table name: "))
+        deleteAllRecord(table);
     elif item == '8':
-        os.system("clear")
+        os.system('cls' if os.name == 'nt' else 'clear')
         menu()
-
-# SELECT * FROM arduinoproject.measures;
-# SELECT * FROM arduinoproject.environment;
-# SELECT * FROM arduinoproject.physical_quantity;
-# SELECT read_value FROM arduinoproject.measures;
-#
-#
-#
-# DELETE FROM arduinoproject.environment;
-# DELETE FROM arduinoproject.measures;
-# DELETE FROM arduinoproject.physical_quantity;
-#
-# UPDATE arduinoproject.physical_quantity SET description='Humidity' WHERE id=2;
+    else:
+        print("Invalid option! Choose one option from the menu above.")
