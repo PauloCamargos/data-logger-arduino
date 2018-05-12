@@ -20,14 +20,9 @@ import time
 import serial
 import os
 
-# Global Data:
-HUMIDITY_CARACTER = 'U'
-TEMP_CARACTER = 'T'
-USER_ID = checkUser()
-database = database.Banco('projects', 'arduinoproject',
-                          'postgres', 'banco')
-database.connection()
-comport = serial.Serial('/dev/ttyACM0', 9600, timeout=3)
+################
+# Global Data: #
+################
 
 
 def checkUser():
@@ -41,6 +36,19 @@ def checkUser():
     """
     USER_ID = raw_input('>>> Insert your user ID: ')
     return USER_ID
+
+
+HUMIDITY_CARACTER = 'U'
+TEMP_CARACTER = 'T'
+USER_ID = raw_input('>>> Insert your user ID: ')
+database = database.Banco('projects', 'arduinoproject',
+                          'postgres', 'banco')
+database.connection()
+comport = serial.Serial('/dev/ttyACM0', 9600, timeout=3)
+
+##########################
+# Application Functions: #
+##########################
 
 
 def readUnity(PARAM_CARACTER):
