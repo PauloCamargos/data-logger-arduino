@@ -15,6 +15,7 @@ USED SQL:
     * UPDATE_
     * MAX
     * INNER JOIN_
+    * ORDER BY_
 Authors
 -------
     * Paulo
@@ -180,6 +181,25 @@ class Banco:
             print(error)
 
     def selectDataWhere(self, table, condition, condition_value, *args):
+        """Selects data from a specified table with a specified condition.
+
+        Parameters
+        ----------
+        table : String
+            Table from which data will be retrieved.
+        condition : String
+            Field name of the where clause.
+        condition_value : String
+            Field's value of the where clause.
+        *args : String
+            Fields to be retrieved.
+
+        Returns
+        -------
+        Tuple
+            Returns a tupe with the data retrieved from the database.
+
+        """
         fields = " "
         for arg in args:
             fields += arg + ", "
@@ -232,10 +252,37 @@ class Banco:
             tuple.
 
         """
-        self.query = "SELECT * FROM " + self.schema + "." + table + ";"
+        self.query = "SELECT * FROM " + self.schema + "." + table + " ORDER BY id asc;"
         self.cur.execute(self.query)
         rows = self.cur.fetchall()
         return rows
+
+    def deleteDataFrom(self, table, condition, condition_value):
+        """Short summary.
+
+        Parameters
+        ----------
+        table : String
+            Table from which data will be removed.
+        condition : String
+            Field name of the where clause.
+        condition_value : String
+            Field's value of the where clause.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        self.query = "DELETE FROM " + self.schema + "." + table \
+                     + " WHERE " + condition + "=%s"
+
+        condition_value = (condition_value, )
+
+        self.cur.execute(self.query, condition_value)
+        self.con.commit()
+        # DEBUG: print(self.query)
 
     def deleteLastRecordFrom(self, table):
         """Deletes the last record from a specified table.
@@ -280,7 +327,7 @@ class Banco:
         Parameters
         ----------
         user_id (optional): Int
-            User id whom database associated records will be retrieved. If not passed, all records
+            User id of whom database associated records will be retrieved. If not passed, all records
             will be retrieved and returned.
 
         Returns
@@ -289,12 +336,11 @@ class Banco:
             Returns a tuple of tupes. Each tuple is a record retrieved.
 
         """
-        self.query = "SELECT m.id AS \
-                      id_measure, u.usr_fullname , m.read_value, p.unity \
+        self.query = "SELECT m.id, u.usr_fullname , m.read_value, p.unity \
                       FROM arduinoproject.measures m \
                       INNER JOIN arduinoproject.users u ON m.id_user = u.id \
                       INNER JOIN arduinoproject.physical_quantity p \
-                      ON m.id_pquantity = p.id"
+                      ON m.id_pquantity = p.id ORDER BY m.id desc"
         self.cur.execute(self.query)
         rows = self.cur.fetchall()
         return rows

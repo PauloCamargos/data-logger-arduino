@@ -12,6 +12,7 @@ Authors
 -------
     * Paulo
     * Thiago
+    * Italo
 References
 ----------
     1. http://initd.org/psycopg/docs/genindex.html
@@ -293,10 +294,10 @@ def menu():
 
     """
     print('\n----------------------------- MENU ------------------------------')
-    print('0 - EXIT PROGRAM                     |    10 - * Create user infos')
-    print('1 - Read temperature                 |    11 - * Check users info')
-    print('2 - Read humidity                    |    12 - * Update user infos')
-    print('3 - Read both (temp. and umid.)      |    13 - * Remove user')
+    print('0 - EXIT PROGRAM                     |    10 - Create user')
+    print('1 - Read temperature                 |    11 - Check users info')
+    print('2 - Read humidity                    |    12 - Update user infos')
+    print('3 - Read both (temp. and umid.)      |    13 - Remove user')
     print('4 - Visualize the last record        |    14 - *')
     print('5 - Visualize all record             |    15 - *')
     print('6 - Delete last record               |    16 - *')
@@ -351,9 +352,52 @@ def main():
 
         elif item == '8':
             visualizeByUser()
+
         elif item == 'C' or item == 'c':
             os.system('cls' if os.name == 'nt' else 'clear')
             menu()
+
+        elif item == '10':
+            # TODO: Check possibility dividing this main.py in classes
+            print("---------------- CREATE USER -----------")
+            usr_fulname = str(raw_input("Enter user full name: "))
+            usr_contact = str(raw_input("Enter user contact: "))
+            username = str(raw_input("Enter user username: "))
+            pswd = str(raw_input("Enter user password: "))
+            database.insertDataInto(table='users', usr_fullname=usr_fulname, usr_contact=usr_contact, username=username, pswd=pswd)
+            print("User create with success!")
+            print("--------- \n")
+
+        elif item == '11':
+            print("\n---------------- USERs INFOs-----------")
+            print("Fetching all records from table 'users'")
+            rows = database.selectAllDataFrom('users')
+            if rows:
+                for row in rows:
+                    print row
+            else:
+                print("No data found!")
+            print("--------- \n")
+
+        elif item == '12':
+            print("\n-------------- UPDATE USER ---------")
+            usrname = str(raw_input("> Type the username of the user whom data will be updated: "))
+            field = str(raw_input("> Update which field(s)? Ex.: usr_fullname, active, pswd: " ))
+            field = field.split(",")
+            values = str(raw_input("> Which values? (same order): "))
+            values = values.split(",")
+            fv_dictio = dict(zip(field, values))
+            database.updateDataFrom(table='users', condition='username', condition_value=usrname, **fv_dictio)
+            print("User updated with success!")
+            print("--------- \n")
+
+        elif item == '13':
+            print("\n-------------- UPDATE USER ---------")
+            usrname = str(raw_input("> Type the username of the user to be removed: "))
+            database.deleteDataFrom(table='users', condition='username', condition_value=usrname)
+            print("User deleted with success!")
+            print("--------- \n")
+
         else:
             print("Invalid option! Choose one option from the menu above.\n")
 
