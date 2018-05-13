@@ -32,14 +32,14 @@ TEMP_CHARACTER = 'T'
 database = database.Banco('projects', 'arduinoproject',
                           'postgres', 'banco')
 database.connection()
-comport = serial.Serial('/dev/ttyACM2', 9600, timeout=3)
+comport = serial.Serial('/dev/ttyACM0', 9600, timeout=3)
 def checkUser():
     """Asks the user for input the USER_ID
 
     Returns
     -------
-    int
-        USER_ID inserted by the user.
+    tuple
+        USER_ID and USER_FULLNAME.
 
     """
     username_value = str(raw_input('>>> Insert your username: '))
@@ -364,13 +364,15 @@ def main():
             usr_contact = str(raw_input("Enter user contact: "))
             username = str(raw_input("Enter user username: "))
             pswd = str(raw_input("Enter user password: "))
-            database.insertDataInto(table='users', usr_fullname=usr_fulname, usr_contact=usr_contact, username=username, pswd=pswd)
+            database.insertDataInto(table='users', usr_fullname=usr_fulname,
+                                    usr_contact=usr_contact, username=username,
+                                    pswd=pswd)
             print("User create with success!")
             print("--------- \n")
 
         elif item == '11':
             print("\n---------------- USERs INFOs-----------")
-            print("Fetching all records from table 'users'")
+            print("Fetching all records from table 'users'...")
             rows = database.selectAllDataFrom('users')
             if rows:
                 for row in rows:
