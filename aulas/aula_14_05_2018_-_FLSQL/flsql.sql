@@ -72,3 +72,68 @@ LANGUAGE plpgsql;
 SELECT * FROM aula08.fn_ret_nome_cliente(1);
 
 -- Retornar varios clientes %RowType
+CREATE OR REPLACE FUNCTION aula08.fn_ret_nome_cliente_tupla(integer) RETURNS varchar AS
+$$
+    DECLARE
+        v_tupla aula08.tb_cliente%ROWTYPE;
+    BEGIN
+        SELECT * INTO v_tupla FROM aula08.tb_cliente WHERE id_cliente = $1;
+        RETURN 'Tupla (linha): -> ' || v_tupla;
+    END
+$$
+LANGUAGE plpgsql;
+
+SELECT * FROM aula08.fn_ret_nome_cliente_tupla(1);
+
+-- Outro ROWTYPE
+DROP FUNCTION aula08.fn_ret_nome_cliente_tupla;
+CREATE OR REPLACE FUNCTION aula08.fn_ret_nome_cliente_tupla(integer) RETURNS text AS
+$$
+    DECLARE
+        v_tupla aula08.tb_cliente%ROWTYPE;
+    BEGIN
+        SELECT * INTO v_tupla FROM aula08.tb_cliente WHERE id_cliente = $1;
+        RETURN 'Tupla (linha): -> ' || v_tupla;
+    END
+$$
+LANGUAGE plpgsql;
+
+SELECT * FROM aula08.fn_ret_nome_cliente_tupla(1);
+
+-- Outro ROWTYPE
+DROP FUNCTION aula08.fn_ret_nome_cliente_tupla;
+CREATE OR REPLACE FUNCTION aula08.fn_ret_nome_cliente_tupla(integer) RETURNS text AS
+$$
+    DECLARE
+        v_tupla RECORD;
+    BEGIN
+        SELECT id_cliente, nome INTO v_tupla FROM aula08.tb_cliente WHERE id_cliente = $1;
+        RETURN 'Tupla (linha): -> ' || v_tupla;
+    END
+$$
+LANGUAGE plpgsql;
+
+SELECT * FROM aula08.fn_ret_nome_cliente_tupla(1);
+
+
+
+-- Retornar varios clientes %RECORD
+CREATE OR REPLACE FUNCTION
+aula08.fn_ret_nome_cliente_record(aula08.tb_cliente.id_cliente%TYPE)
+RETURNS text AS
+$$
+    DECLARE
+        v_linha RECORD;
+    BEGIN
+        SELECT * INTO v_linha FROM aula08.tb_cliente WHERE id_cliente = $1;
+        IF NOT FOUND THEN
+            RAISE EXCEPTION 'Cliente % não encontrado ', $1;
+        ELSE
+            RETURN 'Cliente encontrado!!';
+        END IF;
+    END
+$$
+LANGUAGE plpgsql;
+
+SELECT * FROM aula08.fn_ret_nome_cliente_record(1);
+SELECT * FROM aula08.fn_ret_nome_cliente_record(10);
