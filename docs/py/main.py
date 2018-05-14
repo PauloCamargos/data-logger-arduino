@@ -33,6 +33,8 @@ database = database.Banco('projects', 'arduinoproject',
                           'postgres', 'banco')
 database.connection()
 comport = serial.Serial('/dev/ttyACM0', 9600, timeout=3)
+
+
 def checkUser():
     """Asks the user for input the USER_ID
 
