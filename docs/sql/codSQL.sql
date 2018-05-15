@@ -63,6 +63,15 @@ DELETE FROM arduinoproject.physical_quantity;
 
 UPDATE arduinoproject.physical_quantity SET description='Humidity' WHERE id=2;
 
-SELECT m.id AS id_measure, u.usr_fullname , m.read_value, p.unity FROM arduinoproject.measures m
+
+SELECT m.id AS id_measure, u.usr_fullname , m.read_value, p.unity, e.description FROM arduinoproject.measures m
 INNER JOIN arduinoproject.users u ON m.id_user = u.id
 INNER JOIN arduinoproject.physical_quantity p ON m.id_pquantity = p.id
+INNER JOIN arduinoproject.environment e ON m.id_environment = e.id
+ORDER BY m.id ASC;
+
+ALTER TABLE arduinoproject.measures
+DROP CONSTRAINT measures_read_value_check;
+
+ALTER TABLE arduinoproject.measures ADD CONSTRAINT
+measures_read_value_check CHECK (read_value > -1);

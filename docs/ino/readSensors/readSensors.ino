@@ -18,7 +18,8 @@
 //Pinos //
 //////////
 #define PINO_UMIDIFICADOR  12
-#define DHTPIN A1 // pino que sensor esta conectado
+#define DHTPIN A1 // pino que sensor Ar esta conectado
+#define HIGOPIN A2 // pino que o sensor de solo esta conectado
 #define DHTTYPE DHT11 // tipo de sensor
 
 /////////////
@@ -29,13 +30,14 @@
 #define CMD_DESLIGAR_UMIDIFICADOR  'u'
 
 #define CMD_LER_TEMPERATURA         'T'
-#define CMD_LER_UMIDADE             'H'
+#define CMD_LER_UMIDADE_AR          'A'
+#define CMD_LER_UMIDADE_SOLO         'S'
 
 ////////////////
 //Global Data //
 ////////////////
 char cmd_serial;
-float read_temp, read_umid;
+float read_temp, read_umid_ar, read_umid_solo;
 
 DHT dht(DHTPIN, DHTTYPE); // dth(pino, tipo)
 
@@ -60,10 +62,14 @@ void loop() {
 //        if(isnan(read_temp/))
           Serial.println(read_temp, 2);
         break;
-      case CMD_LER_UMIDADE:
-        read_umid = dht.readHumidity();
-//         if(isnan(read_umid))/
-           Serial.println(read_umid, 2);
+      case CMD_LER_UMIDADE_AR:
+        read_umid_ar = dht.readHumidity();
+//         if(isnan(read_umid_ar))/
+           Serial.println(read_umid_ar, 2);
+      case CMD_LER_UMIDADE_SOLO:
+        read_umid_solo = analogRead(HIGOPIN)/1023.0;
+        read_umid_solo = (1 - read_umid_solo) * 100;
+        Serial.println(read_umid_solo);
         break;
     }
   }
