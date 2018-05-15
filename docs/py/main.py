@@ -32,7 +32,7 @@ TEMP_CHARACTER = 'T'
 database = database.Banco('projects', 'arduinoproject',
                           'postgres', 'banco')
 database.connection()
-comport = serial.Serial('/dev/ttyACM0', 9600, timeout=3)
+comport = serial.Serial('/dev/ttyACM1', 9600, timeout=3)
 
 
 def checkUser():
@@ -242,7 +242,6 @@ def deleteLastRecord(table):
     database.deleteLastRecordFrom(table)
     print("Finished operation. Table cleared.\n")
     print("--------- \n")
-
 
 
 def deleteAllRecord(table):
