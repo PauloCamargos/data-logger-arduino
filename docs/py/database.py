@@ -336,11 +336,11 @@ class Banco:
             Returns a tuple of tupes. Each tuple is a record retrieved.
 
         """
-        self.query = "SELECT m.id, u.usr_fullname , m.read_value, p.unity \
-                      FROM arduinoproject.measures m \
-                      INNER JOIN arduinoproject.users u ON m.id_user = u.id \
-                      INNER JOIN arduinoproject.physical_quantity p \
-                      ON m.id_pquantity = p.id ORDER BY m.id asc"
+        self.query = "SELECT m.id AS id_measure, u.usr_fullname , m.read_value, p.unity, e.description FROM arduinoproject.measures m \
+                        INNER JOIN arduinoproject.users u ON m.id_user = u.id \
+                        INNER JOIN arduinoproject.physical_quantity p ON m.id_pquantity = p.id \
+                        INNER JOIN arduinoproject.environment e ON m.id_environment = e.id \
+                        ORDER BY m.id ASC"
         self.cur.execute(self.query)
         rows = self.cur.fetchall()
         return rows

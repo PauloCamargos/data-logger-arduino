@@ -27,12 +27,13 @@ import math
 ################
 # Global Data: #
 ################
-HUMIDITY_CHARACTER = 'H'
+HUMIDITY_CHARACTER = 'A'
 TEMP_CHARACTER = 'T'
+SOIL_HUMIDITY_CHARACTER = 'S'
 database = database.Banco('projects', 'arduinoproject',
                           'postgres', 'banco')
 database.connection()
-comport = serial.Serial('/dev/ttyACM1', 9600, timeout=3)
+comport = serial.Serial('/dev/ttyACM0', 9600, timeout=3)
 
 
 def checkUser():
@@ -114,14 +115,14 @@ def readTemperature():
         print("The read temperature is " + str(read_temperature) + "ºC.")
         # columns: id_user, id_envrmt, read_value
         database.insertDataInto(table='measures', id_user=USER_ID,
-                                id_environment=1, id_pquantity=1,
+                                id_environment=3, id_pquantity=1,
                                 read_value=read_temperature)
         print("Success! Data inserted into database.\n")
     else:
         print("Failed to read temperature. Try again in 5 seconds.")
 
 
-def readHumidity():
+def readAirHumidity():
     """This is the option 2 in Application Menu.
     Reads the humidity and inserts it into the database
     This function deppends of `readUnity` and of `insertDataInto`
@@ -129,7 +130,7 @@ def readHumidity():
 
     Example
     -------
-        >>> readHumidity()
+        >>> readAirHumidity()
         Reading and inserting HUMIDITY data into DB...
         The read humidity is 19% UR.
         Success! Data inserted into database.
@@ -139,6 +140,33 @@ def readHumidity():
     read_humidity = readUnity(HUMIDITY_CHARACTER)
     if read_humidity != -1:
         print("The read humidity is " + str(read_humidity) + "%")
+        # columns: id_user, id_envrmt, read_value
+        database.insertDataInto(table='measures', id_user=USER_ID,
+                                id_environment=3, id_pquantity=2,
+                                read_value=read_humidity)
+        print("Success! Data inserted into database.\n")
+    else:
+        print("Failed to read temperature. Try again in 5 seconds.")
+
+
+def readSoilHumidity():
+    """This is the option 2 in Application Menu.
+    Reads the humidity and inserts it into the database
+    This function deppends of `readUnity` and of `insertDataInto`
+    There also are prints showing the status of the request.
+
+    Example
+    -------
+        >>> readAirHumidity()
+        Reading and inserting HUMIDITY data into DB...
+        The read humidity is 19% UR.
+        Success! Data inserted into database.
+
+    """
+    print("Reading and inserting HUMIDITY data into DB...")
+    read_humidity = readUnity(HUMIDITY_CHARACTER)
+    if read_humidity != -1:
+        print("The read humidity of the soil is " + str(read_humidity) + "%")
         # columns: id_user, id_envrmt, read_value
         database.insertDataInto(table='measures', id_user=USER_ID,
                                 id_environment=1, id_pquantity=2,
@@ -161,9 +189,9 @@ def readAll():
         Success! Temperature and humidity inserted into database.
 
     """
-    print("Reading and inserting temperature and humidity into database...\n")
     readTemperature()
-    readHumidity()
+    readAirHumidity()
+    readSoilHumidity()
     print("Success! Temperature and humidity inserted into database.\n")
     # DEBUG: Uncomment here for debbuging
     # print("Temperatura: " + read_temperature)
@@ -287,6 +315,7 @@ def visualizeByUser():
         print("No data found!")
     print("--------- \n")
 
+# ------------------------- MAIN PART -----------------------
 print("########### SEJA MUITO BEM-VINDO, " + USER_FULLNAME+ " ###########")
 
 def menu():
@@ -297,14 +326,14 @@ def menu():
     print('\n----------------------------- MENU ------------------------------')
     print('0 - EXIT PROGRAM                     |    10 - Create user')
     print('1 - Read temperature                 |    11 - Check users info')
-    print('2 - Read humidity                    |    12 - Update user infos')
-    print('3 - Read both (temp. and umid.)      |    13 - Remove user')
-    print('4 - Visualize the last record        |    14 - *')
-    print('5 - Visualize all record             |    15 - *')
+    print('2 - Read air humidity                |    12 - Update user infos')
+    print('3 - Read soil humidity               |    13 - Remove user')
+    print('4 - Visualize the last record        |    14 - Read both (temp. and umid.) ')
+    print('5 - Visualize all record             |    15 - Delete record from table by id')
     print('6 - Delete last record               |    16 - *')
     print('7 - Delete all record                |    17 - *')
     print('8 - Visualize insertions by user     |    18 - *')
-    print('C - Limpar tela                      |    19 - *')
+    print('C - CLEAR SCREEN                     |    19 - *')
     print('-----------------------------------------------------------------\n')
     # * to be implemented
 
@@ -321,9 +350,9 @@ def main():
         elif item == '1':
             readTemperature()
         elif item == '2':
-            readHumidity()
+            readAirHumidity()
         elif item == '3':
-            readAll()
+            readSoilHumidity()
         elif item == '4':
             table = str(raw_input("> Enter table name: "))
             selectLastRecord(table)
@@ -334,7 +363,7 @@ def main():
         elif item == '6':
             ans = str(raw_input("You are about to delete the LAST " +
                                 "record of a table.\nARE YOU SURE? (y/n) "))
-            if ans == 'y' or ans == 'yes':
+            if ans.lower() == 'y' or ans.lower() == 'yes':
                 table = str(raw_input("> Enter the table's name: "))
                 deleteLastRecord(table)
             else:
@@ -344,7 +373,8 @@ def main():
         elif item == '7':
             ans = str(raw_input("> You are about to delete the ALL data " +
                                   "of a table. \nARE YOU SURE? (yes/no) "))
-            if ans == 'y' or ans == 'yes':
+
+            if ans.lower() == 'y' or ans.lower() == 'yes':
                 table = str(raw_input("> Enter the table's name: "))
                 deleteAllRecord(table)
             else:
@@ -395,10 +425,21 @@ def main():
             print("--------- \n")
 
         elif item == '13':
-            print("\n-------------- UPDATE USER ---------")
+            print("\n-------------- REMOVE USER ---------")
             usrname = str(raw_input("> Type the username of the user to be removed: "))
             database.deleteDataFrom(table='users', condition='username', condition_value=usrname)
             print("User deleted with success!")
+            print("--------- \n")
+
+        elif item == '14':
+            readAll();
+
+        elif item == '15':
+            print("\n-------------- DELETE RECORD FROM TABLE BY ID----------")
+            table = str(raw_input("> Type the table's name from which the record will be removed: "))
+            id_record = str(raw_input("> Type the id of the record to be removed: "))
+            database.deleteDataFrom(table=table, condition='id', condition_value=id_record)
+            print("Data deleted with success!")
             print("--------- \n")
 
         else:
