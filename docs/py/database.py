@@ -21,6 +21,7 @@ Authors
     * Paulo
     * Thiago
     * Italo
+	* Pablo
 References_
 ----------
     1. http://initd.org/psycopg/docs/genindex.html
@@ -30,7 +31,7 @@ import psycopg2  # PostgreSQL database adapter for Python
 
 
 class Banco:
-    """Database class. Use this class to create connection e execute CRUD
+    """Database class. Use this class to create connection and execute CRUD
     commands on a database.
 
     Parameters
@@ -92,7 +93,7 @@ class Banco:
             Table which the data will be inserted.
         **kwargs : String
             Fields and values to be inserted in the table. Use the template
-            fieldName='value' to pass the columns and values. Ilimited number
+            fieldName='value' to pass the columns and values. Unlimited number
             of parameters allowed here.
 
         Returns
@@ -248,7 +249,7 @@ class Banco:
         Returns
         -------
         Tuple
-            Return a tuple containing all data from a table, each onde inside a
+            Return a tuple containing all data from a table, each one inside a
             tuple.
 
         """
@@ -321,13 +322,13 @@ class Banco:
         self.con.commit()
 
     def visualizeByUser(self, user_id=None):
-        """Selects the id of a mesure, it's value and it's unity and the name of the user who
+        """Selects the id of a measure, it's value and it's unity and the name of the user who
         registered the data. User id is optional. If not passed, returns all records.
 
         Parameters
         ----------
         user_id (optional): Int
-            User id of whom database associated records will be retrieved. If not passed, all records
+            User id whose database associated records will be retrieved. If not passed, all records
             will be retrieved and returned.
 
         Returns

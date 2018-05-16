@@ -13,6 +13,7 @@ Authors
     * Paulo
     * Thiago
     * Italo
+	* Pablo
 References
 ----------
     1. http://initd.org/psycopg/docs/genindex.html
@@ -58,7 +59,7 @@ USER_ID, USER_FULLNAME = checkUser()
 
 
 def readUnity(PARAM_CARACTER):
-    """Reads a value from the arduino sensores
+    """Reads a value from the arduino sensors
     **ATENTION**: The serial port must be open before calling this function
     It sends a request to the connected arduino and waits
     for a line containing the answer to the request.
@@ -98,7 +99,7 @@ def readTemperature():
     """This is the option 1 in Application Menu.
     Reads the temperatura and inserts it into the database
     This function deppends of `readUnity` and of `insertDataInto`
-    There also are prints showing the status of the request.
+    There are also prints showing the status of the request.
 
     Example
     -------
@@ -150,7 +151,7 @@ def readAirHumidity():
 
 
 def readSoilHumidity():
-    """This is the option 2 in Application Menu.
+    """This is the option 3 in Application Menu.
     Reads the humidity and inserts it into the database
     This function deppends of `readUnity` and of `insertDataInto`
     There also are prints showing the status of the request.
@@ -222,7 +223,7 @@ def selectLastRecord(table):
 
 def selectAllRecord(table):
     """This is the option 5 in Application Menu.
-    Reads the all rows of a determined table and shows it in the terminal.
+    Reads all the rows of a determined table and shows it in the terminal.
 
     Parameters
     ----------
@@ -389,7 +390,7 @@ def main():
             menu()
 
         elif item == '10':
-            # TODO: Check possibility dividing this main.py in classes
+            # TODO: Check possibility of dividing this main.py in classes
             print("---------------- CREATE USER -----------")
             usr_fulname = str(raw_input("Enter user full name: "))
             usr_contact = str(raw_input("Enter user contact: "))
@@ -414,7 +415,7 @@ def main():
 
         elif item == '12':
             print("\n-------------- UPDATE USER ---------")
-            usrname = str(raw_input("> Type the username of the user whom data will be updated: "))
+            usrname = str(raw_input("> Type the username of the user whose data will be updated: "))
             field = str(raw_input("> Update which field(s)? Ex.: usr_fullname, active, pswd: " ))
             field = field.split(",")
             values = str(raw_input("> Which values? (same order): "))
