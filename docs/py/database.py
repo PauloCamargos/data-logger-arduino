@@ -95,6 +95,7 @@ class Banco:
             Fields and values to be inserted in the table. Use the template
             fieldName='value' to pass the columns and values. Unlimited number
             of parameters allowed here.
+            Ex.: banco.insertDataInto('table_name', field_1='value_1', field_2='value_2')
 
         Returns
         -------
