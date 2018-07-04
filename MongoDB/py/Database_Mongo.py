@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 from pymongo import *
 import serial  # serial communication
-import time #time.sleep(int)
+import time  # time.sleep(int)
 import os  # os.system('clear')
 import math
 import serial.tools.list_ports
@@ -22,7 +21,6 @@ comport = serial.Serial(port_name, 9600, timeout=3)
 
 
 def checkUser():
-
     """Asks the user for input the USER_ID
 
         Returns
@@ -44,7 +42,6 @@ def checkUser():
 user_data = checkUser()
 user_id = user_data.get('_id')
 user_fullname = user_data.get('usr_fullname')
-
 
 ##########################
 # Application Functions: #
@@ -88,6 +85,7 @@ def readUnity(PARAM_CARACTER):
     return VALUE_SERIAL
 """
 
+
 def readTemperature():
     """This is the option 1 in Application Menu.
     Reads the temperatura and inserts it into the database
@@ -110,7 +108,7 @@ def readTemperature():
         # columns: id_user, id_envrmt, read_value
         measures = db.measures
         measures.insert_one({'id_user': user_id, 'id_environment': 3, 'id_pquantity': 1,
-                                      'read_value': read_temperature})
+                             'read_value': read_temperature})
         print("Success! Data inserted into database.\n")
     else:
         print("Failed to read temperature. Try again in 5 seconds.")
@@ -137,7 +135,7 @@ def readAirHumidity():
         # columns: id_user, id_envrmt, read_value
         measures = db.measures
         measures.insert_one({'id_user': user_id, 'id_environment': 3, 'id_pquantity': 2,
-                                      'read_value': read_humidity})
+                             'read_value': read_humidity})
         print("Success! Data inserted into database.\n")
     else:
         print("Failed to read temperature. Try again in 5 seconds.")
@@ -218,7 +216,6 @@ def selectLastRecord(table):
         p_quantity = db.physical_quantity
         last_db_data = p_quantity.find().sort('_id', -1).limit(1)
 
-
     print("Fetching last record from table '" + table + "'")
 
     for i in last_db_data:
@@ -262,6 +259,7 @@ def selectAllRecord(table):
         print("No data found!")
     print("--------- \n")
 
+
 def deleteLastRecord(table):
     """This is the option 6 in Application Menu.
     Delets the last row of a determined table.
@@ -291,7 +289,6 @@ def deleteLastRecord(table):
     elif table == 'physical_quantity':
         p_quantity = db.physical_quantity
         p_quantity.find_one_and_delete({}, sort=[('_id', -1)])
-
 
     print("Deleting last record from " + table)
     print("Finished operation. Table cleared.\n")
@@ -388,7 +385,7 @@ def main():
 
         elif item == '6':
             ans = str(input("You are about to delete the LAST " +
-                                "record of a table.\nARE YOU SURE? (y/n) "))
+                            "record of a table.\nARE YOU SURE? (y/n) "))
             if ans.lower() == 'y' or ans.lower() == 'yes':
                 table = str(input("> Enter the table's name: "))
                 deleteLastRecord(table)
@@ -398,7 +395,7 @@ def main():
 
         elif item == '7':
             ans = str(input("> You are about to delete the ALL data " +
-                                  "of a table. \nARE YOU SURE? (yes/no) "))
+                            "of a table. \nARE YOU SURE? (yes/no) "))
 
             if ans.lower() == 'y' or ans.lower() == 'yes':
                 table = str(input("> Enter the table's name: "))
@@ -407,9 +404,8 @@ def main():
                 print("Operation aborted. Returning to menu...")
                 print("--------- \n")
 
-        #elif item == '8':
+        # elif item == '8':
         #    visualizeByUser()
-
 
         elif item == 'C' or item == 'c':
             os.system('cls' if os.name == 'nt' else 'clear')
@@ -424,7 +420,7 @@ def main():
             pswd = str(input("Enter user password: "))
             users = db.users
             users.insert_one({'usr_fullname': usr_fulname, 'usr_contact': usr_contact,
-                              'username': username, 'password': pswd })
+                              'username': username, 'password': pswd})
             print("User create with success!")
             print("--------- \n")
 
@@ -470,7 +466,7 @@ def main():
             table = str(input("> Type the table's name from which the record will be removed: "))
             id_record = str(input("> Type the id of the record to be removed: "))
             users.find_one_and_delete({'_id': id_record})
-            #database.deleteDataFrom(table=table, condition='id', condition_value=id_record)
+            # database.deleteDataFrom(table=table, condition='id', condition_value=id_record)
             print("Data deleted with success!")
             print("--------- \n")
 
