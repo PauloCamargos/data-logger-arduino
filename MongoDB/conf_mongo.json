@@ -61,8 +61,8 @@ farenheit = {
 }
 
 umidade = {
-  type = "Umidade",
-  unity = "%",
+  type: "Umidade",
+  unity: "%"
 }
 db.physical_quantity.save(celsius)
 db.physical_quantity.save(farenheit)
