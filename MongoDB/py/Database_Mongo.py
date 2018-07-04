@@ -443,10 +443,10 @@ def main():
 
         elif item == '12':
             print("\n-------------- UPDATE USER ---------")
-            usrname = str(raw_input("> Type the username of the user whose data will be updated: "))
-            field = str(raw_input("> Update which field(s)? Ex.: usr_fullname, active, pswd: " ))
+            usrname = str(input("> Type the username of the user whose data will be updated: "))
+            field = str(input("> Update which field(s)? Ex.: usr_fullname, active, pswd: " ))
             field = field.split(",")
-            values = str(raw_input("> Which values? (same order): "))
+            values = str(input("> Which values? (same order): "))
             values = values.split(",")
             fv_dictio = dict(zip(field, values))
             database.updateDataFrom(table='users', condition='username', condition_value=usrname, **fv_dictio)
@@ -455,7 +455,7 @@ def main():
 
         elif item == '13':
             print("\n-------------- REMOVE USER ---------")
-            usrname = str(raw_input("> Type the username of the user to be removed: "))
+            usrname = str(input("> Type the username of the user to be removed: "))
             database.deleteDataFrom(table='users', condition='username', condition_value=usrname)
             print("User deleted with success!")
             print("--------- \n")
@@ -465,8 +465,8 @@ def main():
 
         elif item == '15':
             print("\n-------------- DELETE RECORD FROM TABLE BY ID----------")
-            table = str(raw_input("> Type the table's name from which the record will be removed: "))
-            id_record = str(raw_input("> Type the id of the record to be removed: "))
+            table = str(input("> Type the table's name from which the record will be removed: "))
+            id_record = str(input("> Type the id of the record to be removed: "))
             database.deleteDataFrom(table=table, condition='id', condition_value=id_record)
             print("Data deleted with success!")
             print("--------- \n")
