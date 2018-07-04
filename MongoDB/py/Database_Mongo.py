@@ -190,7 +190,7 @@ def readAll():
     # print("Umidade: " + read_humidity)
 
 
-def selectLastRecord(table):
+def selectLastRecord(collection):
     """This is the option 4 in Application Menu.
     Reads the last row of a determined table and shows it in the terminal.
 
@@ -206,15 +206,19 @@ def selectLastRecord(table):
 
     """
 
-    if table == 'measures':
-        measures = db.measures
-        last_db_data = measures.find().sort('_id', -1).limit(1)
-    elif table == 'environment':
-        environment = db.environment
-        last_db_data = environment.find().sort('_id', -1).limit(1)
-    elif table == 'physical_quantity':
-        p_quantity = db.physical_quantity
-        last_db_data = p_quantity.find().sort('_id', -1).limit(1)
+    collection_name = collection
+    collection = db[collection_name]
+    collection.find().sort('_id', -1).limit(1)
+
+    # if table == 'measures':
+    #     measures = db.measures
+    #     last_db_data = measures.find().sort('_id', -1).limit(1)
+    # elif table == 'environment':
+    #     environment = db.environment
+    #     last_db_data = environment.find().sort('_id', -1).limit(1)
+    # elif table == 'physical_quantity':
+    #     p_quantity = db.physical_quantity
+    #     last_db_data = p_quantity.find().sort('_id', -1).limit(1)
 
     print("Fetching last record from table '" + table + "'")
 
@@ -223,7 +227,7 @@ def selectLastRecord(table):
     print("--------- \n")
 
 
-def selectAllRecord(table):
+def selectAllRecord(collection):
     """This is the option 5 in Application Menu.
     Reads all the rows of a determined table and shows it in the terminal.
 
@@ -240,15 +244,19 @@ def selectAllRecord(table):
     """
     # TODO: Terminar o exemplo na documentação
 
-    if table == 'measures':
-        measures = db.measures
-        documents = measures.find()
-    elif table == 'environment':
-        environment = db.environment
-        documents = environment.find()
-    elif table == 'physical_quantity':
-        p_quantity = db.physical_quantity
-        documents = p_quantity.find()
+    collection_name = collection
+    collection = db[collection_name]
+    collection.find()
+
+    # if table == 'measures':
+    #     measures = db.measures
+    #     documents = measures.find()
+    # elif table == 'environment':
+    #     environment = db.environment
+    #     documents = environment.find()
+    # elif table == 'physical_quantity':
+    #     p_quantity = db.physical_quantity
+    #     documents = p_quantity.find()
 
     print("Fetching all records from table '" + table + "'")
 
@@ -260,7 +268,7 @@ def selectAllRecord(table):
     print("--------- \n")
 
 
-def deleteLastRecord(table):
+def deleteLastRecord(collection):
     """This is the option 6 in Application Menu.
     Delets the last row of a determined table.
     Before the operation it asks the user for confimation.
@@ -280,22 +288,26 @@ def deleteLastRecord(table):
 
     """
 
-    if table == 'measures':
-        measures = db.measures
-        measures.find_one_and_delete({}, sort=[('_id', -1)])
-    elif table == 'environment':
-        environment = db.environment
-        environment.find_one_and_delete({}, sort=[('_id', -1)])
-    elif table == 'physical_quantity':
-        p_quantity = db.physical_quantity
-        p_quantity.find_one_and_delete({}, sort=[('_id', -1)])
+    collection_name = collection
+    collection = db[collection_name]
+    collection.find_one_and_delete({}, sort=[('_id', -1)])
+
+    # if table == 'measures':
+    #     measures = db.measures
+    #     measures.find_one_and_delete({}, sort=[('_id', -1)])
+    # elif table == 'environment':
+    #     environment = db.environment
+    #     environment.find_one_and_delete({}, sort=[('_id', -1)])
+    # elif table == 'physical_quantity':
+    #     p_quantity = db.physical_quantity
+    #     p_quantity.find_one_and_delete({}, sort=[('_id', -1)])
 
     print("Deleting last record from " + table)
     print("Finished operation. Table cleared.\n")
     print("--------- \n")
 
 
-def deleteAllRecord(table):
+def deleteAllRecord(collection):
     """This is the option 7 in Application Menu.
     Delets all the rows of a determined table.
     Before the operation it asks the user for confimation.
@@ -314,16 +326,9 @@ def deleteAllRecord(table):
         Finished operation. Table cleared.
 
     """
-
-    if table == 'measures':
-        measures = db.measures
-        measures.delete_many({})
-    elif table == 'environment':
-        environment = db.environment
-        environment.delete_many({})
-    elif table == 'physical_quantity':
-        p_quantity = db.physical_quantity
-        p_quantity.delete_many({})
+    collection_name = collection
+    collection = db[collection_name]
+    collection.delete_many({})
 
     print("Deleting all records from " + table)
     print("Finished operation. Table cleared.")
@@ -463,9 +468,10 @@ def main():
 
         elif item == '15':
             print("\n-------------- DELETE RECORD FROM TABLE BY ID----------")
-            table = str(input("> Type the table's name from which the record will be removed: "))
+            collection_name = str(input("> Type the table's name from which the record will be removed: "))
+            collection = db[collection_name]
             id_record = str(input("> Type the id of the record to be removed: "))
-            users.find_one_and_delete({'_id': id_record})
+            collection.find_one_and_delete({'_id': id_record})
             # database.deleteDataFrom(table=table, condition='id', condition_value=id_record)
             print("Data deleted with success!")
             print("--------- \n")
