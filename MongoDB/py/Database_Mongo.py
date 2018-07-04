@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pymongo import *
 import serial  # serial communication
 import time #time.sleep(int)
@@ -75,7 +76,7 @@ def readUnity(PARAM_CARACTER):
         >> readUnity('U') # Humidity
         19.2
 
-    
+
     comport.write(PARAM_CARACTER)
     time.sleep(1.8)
     VALUE_SERIAL = float(comport.readline())
@@ -100,7 +101,7 @@ def readTemperature():
         The read temperature is 25.0ºC.
         Success! Data inserted into database.
     """
-    
+
     print("Reading and inserting TEMPERATURE data into DB...")
     read_temperature = readUnity(TEMP_CHARACTER)
 

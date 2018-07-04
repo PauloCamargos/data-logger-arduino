@@ -1,0 +1,69 @@
+sudo service mongod start
+mongo start
+
+
+use datalogger
+
+db.createCollection("users")
+db.createCollections("environments")
+db.createCollection("medidas")
+db.createCollection("physical_quantity")
+
+thiago =   {
+    username: "thiago@ufu.br",
+    fullname: "Thiago Pereira Oliveira",
+    status: "Ativo",
+    password: "thiagoufu"
+  }
+
+paulo = {
+    username: "paulo@ufu.br",
+    fullname: "Paulo Camargos Silva",
+    status: "Ativo",
+    password: "pauloufu"
+}
+
+marcio = {
+  username: "marcio@ufu.br",
+  fullname: "Marcio Cunha",
+  status: "Ativo",
+  password: "marcioufu"
+}
+
+db.users.save(paulo)
+db.users.save(thiago)
+db.users.save(marcio)
+
+-----------------------------
+ar = {
+  description: "Ar"
+}
+
+agua ={
+  description: "Água"
+  }
+
+solo = {
+  description: "Solo"
+}
+db.environments.save(ar)
+db.environments.save(agua)
+db.environments.save(solo)
+-----------------------------
+celsius = {
+  type: "Temperatura",
+  unity: "°C"
+}
+
+farenheit = {
+  type: "Tempeartura",
+  unity: "F"
+}
+
+umidade = {
+  type: "Umidade",
+  unity: "%"
+}
+db.physical_quantity.save(celsius)
+db.physical_quantity.save(farenheit)
+db.physical_quantity.save(umidade)
