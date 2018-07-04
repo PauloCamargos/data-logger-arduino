@@ -19,6 +19,11 @@ port_name = serial.tools.list_ports.comports()[0].device
 print(port_name)
 comport = serial.Serial(port_name, 9600, timeout=3)
 
+# Getting collections
+environment_coll = db.environment
+pquantity_coll = db.physical_quantity
+measues_coll = db.measues
+user_coll = db.users
 
 def checkUser():
     """Asks the user for input the USER_ID
@@ -30,8 +35,7 @@ def checkUser():
 
         """
     username_value = str(input('>>> Insert your username: '))
-    users = db.users
-    user = users.find_one(
+    user = users_coll.find_one(
         {'username': username_value},
         {'_id': 1, 'usr_fullname': 1}
     )
@@ -42,6 +46,7 @@ def checkUser():
 user_data = checkUser()
 user_id = user_data.get('_id')
 user_fullname = user_data.get('usr_fullname')
+
 
 ##########################
 # Application Functions: #
@@ -102,12 +107,11 @@ def readTemperature():
 
     print("Reading and inserting TEMPERATURE data into DB...")
     read_temperature = readUnity(TEMP_CHARACTER)
-
     if read_temperature != -1:
         print("The read temperature is " + str(read_temperature) + "ºC.")
         # columns: id_user, id_envrmt, read_value
         measures = db.measures
-        measures.insert_one({'id_user': user_id, 'id_environment': 3, 'id_pquantity': 1,
+        measures_coll.insert_one({'id_user': user_id, 'id_environment': 3, 'id_pquantity': 1,
                              'read_value': read_temperature})
         print("Success! Data inserted into database.\n")
     else:
@@ -128,14 +132,21 @@ def readAirHumidity():
         Success! Data inserted into database.
 
     """
+
+    id_environment = db.find_one({'description': 'Ar'}, {_id: 1})
+    id_pquantity = db.find_one({'type': 'Umidade'}, {_id: 1})
+
     print("Reading and inserting HUMIDITY data into DB...")
     read_humidity = readUnity(HUMIDITY_CHARACTER)
     if read_humidity != -1:
         print("The read AIR humidity is " + str(read_humidity) + "%")
         # columns: id_user, id_envrmt, read_value
         measures = db.measures
-        measures.insert_one({'id_user': user_id, 'id_environment': 3, 'id_pquantity': 2,
-                             'read_value': read_humidity})
+        measures_coll.insert_one({'id_user': user_id,
+                                'id_environment': id_environment,
+                                'id_pquantity': id_pquantity,
+                                'read_value': read_humidity}
+                                )
         print("Success! Data inserted into database.\n")
     else:
         print("Failed to read temperature. Try again in 5 seconds.")
@@ -161,7 +172,7 @@ def readSoilHumidity():
         print("The read humidity of the soil is " + str(read_humidity) + "%")
         # columns: id_user, id_envrmt, read_value
         measures = db.measures
-        measures.insert_one({'id_user': user_id, 'id_environment': 1, 'id_pquantity': 2,
+        measures_coll.insert_one({'id_user': user_id, 'id_environment': 1, 'id_pquantity': 2,
                              'read_value': read_humidity})
         print("Success! Data inserted into database.\n")
     else:
@@ -208,10 +219,10 @@ def selectLastRecord(table):
 
     if table == 'measures':
         measures = db.measures
-        last_db_data = measures.find().sort('_id', -1).limit(1)
+        last_db_data = measures_coll.find().sort('_id', -1).limit(1)
     elif table == 'environment':
         environment = db.environment
-        last_db_data = environment.find().sort('_id', -1).limit(1)
+        last_db_data = environment_coll.find().sort('_id', -1).limit(1)
     elif table == 'physical_quantity':
         p_quantity = db.physical_quantity
         last_db_data = p_quantity.find().sort('_id', -1).limit(1)
@@ -242,10 +253,10 @@ def selectAllRecord(table):
 
     if table == 'measures':
         measures = db.measures
-        documents = measures.find()
+        documents = measures_coll.find()
     elif table == 'environment':
         environment = db.environment
-        documents = environment.find()
+        documents = environment_coll.find()
     elif table == 'physical_quantity':
         p_quantity = db.physical_quantity
         documents = p_quantity.find()
@@ -282,10 +293,10 @@ def deleteLastRecord(table):
 
     if table == 'measures':
         measures = db.measures
-        measures.find_one_and_delete({}, sort=[('_id', -1)])
+        measures_coll.find_one_and_delete({}, sort=[('_id', -1)])
     elif table == 'environment':
         environment = db.environment
-        environment.find_one_and_delete({}, sort=[('_id', -1)])
+        environment_coll.find_one_and_delete({}, sort=[('_id', -1)])
     elif table == 'physical_quantity':
         p_quantity = db.physical_quantity
         p_quantity.find_one_and_delete({}, sort=[('_id', -1)])
@@ -317,10 +328,10 @@ def deleteAllRecord(table):
 
     if table == 'measures':
         measures = db.measures
-        measures.delete_many({})
+        measures_coll.delete_many({})
     elif table == 'environment':
         environment = db.environment
-        environment.delete_many({})
+        environment_coll.delete_many({})
     elif table == 'physical_quantity':
         p_quantity = db.physical_quantity
         p_quantity.delete_many({})
@@ -419,7 +430,7 @@ def main():
             username = str(input("Enter user username: "))
             pswd = str(input("Enter user password: "))
             users = db.users
-            users.insert_one({'usr_fullname': usr_fulname, 'usr_contact': usr_contact,
+            users_coll.insert_one({'usr_fullname': usr_fulname, 'usr_contact': usr_contact,
                               'username': username, 'password': pswd})
             print("User create with success!")
             print("--------- \n")
@@ -428,7 +439,7 @@ def main():
             print("\n---------------- USERs INFOs-----------")
             print("Fetching all records from table 'users'...")
             users = db.users
-            rows = users.find()
+            rows = users_coll.find()
             if rows:
                 for row in rows:
                     print(row)
@@ -446,7 +457,7 @@ def main():
             values = values.split(",")
             fv_dictio = dict(zip(field, values))
             users = db.users
-            users.update_one({'username': usrname}, {'$set': fv_dictio})
+            users_coll.update_one({'username': usrname}, {'$set': fv_dictio})
             print("User updated with success!")
             print("--------- \n")
 
@@ -454,7 +465,7 @@ def main():
             print("\n-------------- REMOVE USER ---------")
             usrname = str(input("> Type the username of the user to be removed: "))
             users = db.users
-            users.find_one_and_delete({'username': usrname})
+            users_coll.find_one_and_delete({'username': usrname})
             print("User deleted with success!")
             print("--------- \n")
 
@@ -465,7 +476,7 @@ def main():
             print("\n-------------- DELETE RECORD FROM TABLE BY ID----------")
             table = str(input("> Type the table's name from which the record will be removed: "))
             id_record = str(input("> Type the id of the record to be removed: "))
-            users.find_one_and_delete({'_id': id_record})
+            users_coll.find_one_and_delete({'_id': id_record})
             # database.deleteDataFrom(table=table, condition='id', condition_value=id_record)
             print("Data deleted with success!")
             print("--------- \n")
