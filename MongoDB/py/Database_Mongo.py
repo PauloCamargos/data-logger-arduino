@@ -3,7 +3,7 @@ import serial  # serial communication
 import time #time.sleep(int)
 import os  # os.system('clear')
 import math
-#import serial.tools.list_ports
+import serial.tools.list_ports
 
 ################
 # Global Data: #
@@ -15,9 +15,9 @@ SOIL_HUMIDITY_CHARACTER = 'S'
 client = MongoClient('localhost', 27017)  # Iniciando a conexão com o banco
 db = client.datalogger  # Acessando a Collection "datalogger"
 
-#port_name = serial.tools.list_ports.comports()[0].device
-#print(port_name)
-#comport = serial.Serial(port_name, 9600, timeout=3)
+port_name = serial.tools.list_ports.comports()[0].device
+print(port_name)
+comport = serial.Serial(port_name, 9600, timeout=3)
 
 
 def checkUser():
@@ -422,51 +422,54 @@ def main():
             username = str(input("Enter user username: "))
             pswd = str(input("Enter user password: "))
             users = db.users
-            user.insert_one
-            database.insertDataInto(table='users', usr_fullname=usr_fulname,
-                                    usr_contact=usr_contact, username=username,
-                                    pswd=pswd)
+            users.insert_one({'usr_fullname': usr_fulname, 'usr_contact': usr_contact,
+                              'username': username, 'password': pswd })
             print("User create with success!")
             print("--------- \n")
 
         elif item == '11':
             print("\n---------------- USERs INFOs-----------")
             print("Fetching all records from table 'users'...")
-            rows = database.selectAllDataFrom('users')
+            users = db.users
+            rows = users.find()
             if rows:
                 for row in rows:
-                    print row
+                    print(row)
             else:
                 print("No data found!")
             print("--------- \n")
 
         elif item == '12':
             print("\n-------------- UPDATE USER ---------")
-            usrname = str(raw_input("> Type the username of the user whose data will be updated: "))
-            field = str(raw_input("> Update which field(s)? Ex.: usr_fullname, active, pswd: " ))
+            usrname = str(input("> Type the username of the user whose data will be updated: "))
+            field = str(input("> Update which field(s)? Ex.: 'usr_fullname', 'active', 'pswd': "
+                              "(The '' signs are required)"))
             field = field.split(",")
-            values = str(raw_input("> Which values? (same order): "))
+            values = str(input("> Which values? (same order): "))
             values = values.split(",")
             fv_dictio = dict(zip(field, values))
-            database.updateDataFrom(table='users', condition='username', condition_value=usrname, **fv_dictio)
+            users = db.users
+            users.update_one({'username': usrname}, {'$set': fv_dictio})
             print("User updated with success!")
             print("--------- \n")
 
         elif item == '13':
             print("\n-------------- REMOVE USER ---------")
-            usrname = str(raw_input("> Type the username of the user to be removed: "))
-            database.deleteDataFrom(table='users', condition='username', condition_value=usrname)
+            usrname = str(input("> Type the username of the user to be removed: "))
+            users = db.users
+            users.find_one_and_delete({'username': usrname})
             print("User deleted with success!")
             print("--------- \n")
 
         elif item == '14':
-            readAll();
+            readAll()
 
         elif item == '15':
             print("\n-------------- DELETE RECORD FROM TABLE BY ID----------")
-            table = str(raw_input("> Type the table's name from which the record will be removed: "))
-            id_record = str(raw_input("> Type the id of the record to be removed: "))
-            database.deleteDataFrom(table=table, condition='id', condition_value=id_record)
+            table = str(input("> Type the table's name from which the record will be removed: "))
+            id_record = str(input("> Type the id of the record to be removed: "))
+            users.find_one_and_delete({'_id': id_record})
+            #database.deleteDataFrom(table=table, condition='id', condition_value=id_record)
             print("Data deleted with success!")
             print("--------- \n")
 
