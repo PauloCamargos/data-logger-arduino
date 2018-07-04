@@ -52,7 +52,7 @@ db.environments.save(solo)
 -----------------------------
 celsius = {
   type: "Temperatura",
-  unity: "°"
+  unity: "°C"
 }
 
 farenheit = {
