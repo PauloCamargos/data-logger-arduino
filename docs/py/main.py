@@ -24,6 +24,7 @@ import serial  # serial communication
 import time #time.sleep(int)
 import os  # os.system('clear')
 import math
+import serial.tools.list_ports
 
 ################
 # Global Data: #
@@ -34,7 +35,9 @@ SOIL_HUMIDITY_CHARACTER = 'S'
 database = database.Banco('projects', 'arduinoproject',
                           'postgres', 'banco')
 database.connection()
-comport = serial.Serial('/dev/ttyACM0', 9600, timeout=3)
+port_name = serial.tools.list_ports.comports()[0].device
+print(port_name)
+comport = serial.Serial(port_name, 9600, timeout=3)
 
 
 def checkUser():
@@ -140,7 +143,7 @@ def readAirHumidity():
     print("Reading and inserting HUMIDITY data into DB...")
     read_humidity = readUnity(HUMIDITY_CHARACTER)
     if read_humidity != -1:
-        print("The read humidity is " + str(read_humidity) + "%")
+        print("The read AIR humidity is " + str(read_humidity) + "%")
         # columns: id_user, id_envrmt, read_value
         database.insertDataInto(table='measures', id_user=USER_ID,
                                 id_environment=3, id_pquantity=2,
@@ -165,7 +168,7 @@ def readSoilHumidity():
 
     """
     print("Reading and inserting HUMIDITY data into DB...")
-    read_humidity = readUnity(HUMIDITY_CHARACTER)
+    read_humidity = readUnity(SOIL_HUMIDITY_CHARACTER)
     if read_humidity != -1:
         print("The read humidity of the soil is " + str(read_humidity) + "%")
         # columns: id_user, id_envrmt, read_value

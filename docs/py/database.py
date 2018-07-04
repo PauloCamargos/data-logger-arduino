@@ -294,7 +294,9 @@ class Banco:
             Table's name of which the last record will be deleted. This action is irreversible.
 
         Returns
-        -------
+        -------	('Pablo Nunes', 'pablo@ufu.br', 'pablon','senha'),
+	('Marcio Cunha', 'marcio@ufu.br', 'marioc', 'password123');
+
         void
         """
         self.cur.execute("SELECT MAX(id) FROM " + self.schema + "." + table)
