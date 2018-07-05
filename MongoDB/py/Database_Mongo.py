@@ -1,4 +1,5 @@
 from pymongo import *
+from bson.objectid import ObjectId
 import serial  # serial communication
 import time  # time.sleep(int)
 import os  # os.system('clear')
@@ -439,7 +440,7 @@ def main():
                 print("Operation aborted. Returning to menu...")
                 print("--------- \n")
 
-        # elif item == '8':
+        # TODO elif item == '8':
         #    visualizeByUser()
 
         elif item == 'C' or item == 'c':
@@ -449,13 +450,15 @@ def main():
         elif item == '10':
             # TODO: Check possibility of dividing this main.py in classes
             print("---------------- CREATE USER -----------")
-            usr_fulname = str(input("Enter user full name: "))
-            usr_contact = str(input("Enter user contact: "))
-            username = str(input("Enter user username: "))
-            pswd = str(input("Enter user password: "))
+            fullname = str(input("Enter user's full name: "))
+            username = str(input("Enter user's username: "))
+            status = str(input("Enter user's status: "))
+            password = str(input("Enter user's password: "))
             users = db.users
-            users_coll.insert_one({'usr_fullname': usr_fulname, 'usr_contact': usr_contact,
-                              'username': username, 'password': pswd})
+            users_coll.insert_one({'username': username,
+                                'fullname': fullname,
+                                'status': status,
+                                'password': password})
             print("User created with success!")
             print("--------- \n")
 
@@ -473,15 +476,15 @@ def main():
 
         elif item == '12':
             print("\n-------------- UPDATE USER ---------")
-            usrname = str(input("> Type the username of the user whose data will be updated: "))
-            field = str(input("> Update which field(s)? Ex.: 'usr_fullname', 'active', 'pswd': "
-                              "(The ' ' signs are required)") )
+            username = str(input("> Type the username of the user whose data will be updated: "))
+            field = str(input("> Update which field(s)? Ex.: 'fullname', 'status', 'password': "
+                              "(The ' ' signs are required) ") )
             field = field.split(",")
             values = str(input("> Which values? (same order): "))
             values = values.split(",")
             fv_dictio = dict(zip(field, values))
             users = db.users
-            users_coll.update_one({'username': usrname}, {'$set': fv_dictio})
+            users_coll.update_one({'username': username}, {'$set': fv_dictio})
             print("User updated with success!")
             print("--------- \n")
 
@@ -501,7 +504,7 @@ def main():
             collection_name = str(input("> Type the collection's name from which the record will be removed: "))
             collection = db[collection_name]
             id_record = str(input("> Type the id of the record to be removed: "))
-            collection.find_one_and_delete({'_id': id_record})
+            collection.find_one_and_delete({'_id': ObjectId(id_record)})
             # database.deleteDataFrom(collection=collection, condition='id', condition_value=id_record)
             print("Data deleted with success!")
             print("--------- \n")
