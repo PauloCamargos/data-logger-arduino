@@ -394,7 +394,7 @@ def visualizeByUser():
     },
     {
         "$lookup": {
-            "from": "measures",
+            "from": "environments",
             "localField": "id_environment",
             "foreignField": "_id",
             "as": "user_measures_environment"
@@ -402,40 +402,22 @@ def visualizeByUser():
     },
     {
         "$unwind": "$user_measures_environment"
-    }
-
+    },
+    {
+        "$lookup": {
+            "from": "physical_quantity",
+            "localField": "id_pquantity",
+            "foreignField": "_id",
+            "as": "user_measures_environment_pquantity"
+        }
+    },
+        {
+            "$unwind": "$user_measures_environment_pquantity"
+        }
     ]
 
-    # collect_result = db.measures_coll.aggregate(
-    # [
-    # {
-    #     '$lookup': {
-    #         'from': 'users',
-    #         'localField': 'id_user',
-    #         'foreignField': '_id',
-    #         'as': 'user_measures'
-    #
-    #     }
-    # },
-    # {
-    #     '$unwind': '$user_measures'
-    # }
-    # # {
-    # #     "$lookup": {
-    # #         "from": "users",
-    # #         "localField": "id_environment",
-    # #         "foreignField": "_id",
-    # #         "as": "user_measures_environment"
-    # #     }
-    # # },
-    # # {
-    # #     "$unwind": "$user_measures_environment"
-    # # }
-    # ]
-    # )
-
     # pprint.pprint(collect_result)
-    for doc in (users_coll.aggregate(pipeline)):
+    for doc in (measures_coll.aggregate(pipeline)):
         pprint.pprint(doc)
 
 
