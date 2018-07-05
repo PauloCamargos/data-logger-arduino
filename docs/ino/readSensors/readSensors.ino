@@ -66,6 +66,7 @@ void loop() {
         read_umid_ar = dht.readHumidity();
 //         if(isnan(read_umid_ar))/
            Serial.println(read_umid_ar, 2);
+         break;
       case CMD_LER_UMIDADE_SOLO:
         read_umid_solo = analogRead(HIGOPIN)/1023.0;
         read_umid_solo = (1 - read_umid_solo) * 100;

@@ -8,7 +8,7 @@ import serial.tools.list_ports
 ################
 # Global Data: #
 ################
-HUMIDITY_CHARACTER = 'U'.encode()
+HUMIDITY_CHARACTER = 'A'.encode()
 TEMP_CHARACTER = 'T'.encode()
 SOIL_HUMIDITY_CHARACTER = 'S'.encode()
 
@@ -222,35 +222,35 @@ def readAll():
 
 def selectLastRecord(collection):
     """This is the option 4 in Application Menu.
-    Reads the last row of a determined table and shows it in the terminal.
+    Reads the last row of a determined collection and shows it in the terminal.
 
     Parameters
     ----------
-    table : str
-        The name of the table which will be read.
+    collection : str
+        The name of the collection which will be read.
 
     Example
     -------
         #>>> selectLastRecord('measures')
-        Fetching last record from table 'measures'.
+        Fetching last record from collection 'measures'.
 
     """
 
     collection_name = collection
     collection = db[collection_name]
-    collection.find().sort('_id', -1).limit(1)
+    last_db_data = collection.find().sort('_id', -1).limit(1)
 
-    # if table == 'measures':
+    # if collection == 'measures':
     #     measures = db.measures
     #     last_db_data = measures.find().sort('_id', -1).limit(1)
-    # elif table == 'environment':
+    # elif collection == 'environment':
     #     environment = db.environment
     #     last_db_data = environment.find().sort('_id', -1).limit(1)
-    # elif table == 'physical_quantity':
+    # elif collection == 'physical_quantity':
     #     p_quantity = db.physical_quantity
     #     last_db_data = p_quantity.find().sort('_id', -1).limit(1)
 
-    print("Fetching last record from table '" + table + "'")
+    # print("Fetching last record from collection '" + collection + "'")
 
     for i in last_db_data:
         print(i)
@@ -259,36 +259,36 @@ def selectLastRecord(collection):
 
 def selectAllRecord(collection):
     """This is the option 5 in Application Menu.
-    Reads all the rows of a determined table and shows it in the terminal.
+    Reads all the rows of a determined collection and shows it in the terminal.
 
     Parameters
     ----------
-    table : str
-        The name of the table which will be read.
+    collection : str
+        The name of the collection which will be read.
 
     Example
     -------
        # >>> selectAllRecord('measures')
-        Fetching all records from table 'measures'...
+        Fetching all records from collection 'measures'...
 
     """
     # TODO: Terminar o exemplo na documentação
 
     collection_name = collection
     collection = db[collection_name]
-    collection.find()
+    documents = collection.find()
 
-    # if table == 'measures':
+    # if collection == 'measures':
     #     measures = db.measures
     #     documents = measures.find()
-    # elif table == 'environment':
+    # elif collection == 'environment':
     #     environment = db.environment
     #     documents = environment.find()
-    # elif table == 'physical_quantity':
+    # elif collection == 'physical_quantity':
     #     p_quantity = db.physical_quantity
     #     documents = p_quantity.find()
 
-    print("Fetching all records from table '" + table + "'")
+    # print("Fetching all records from collection '" + collection + "'")
 
     if documents:
         for document in documents:
@@ -300,18 +300,18 @@ def selectAllRecord(collection):
 
 def deleteLastRecord(collection):
     """This is the option 6 in Application Menu.
-    Delets the last row of a determined table.
+    Delets the last row of a determined collection.
     Before the operation it asks the user for confimation.
 
     Parameters
     ----------
-    table : str
-        The name of the table which will have a row deleted.
+    collection : str
+        The name of the collection which will have a row deleted.
 
     Example
     -------
         #>>> deleteLastRecord('measures')
-        You are about to delete THE LAST record from the table 'measures'.
+        You are about to delete THE LAST record from the collection 'measures'.
         ARE YOU SURE? (y/n) yes
         Deleting last record from measures
         Finished operation. Collection cleared.
@@ -322,35 +322,35 @@ def deleteLastRecord(collection):
     collection = db[collection_name]
     collection.find_one_and_delete({}, sort=[('_id', -1)])
 
-    # if table == 'measures':
+    # if collection == 'measures':
     #     measures = db.measures
     #     measures.find_one_and_delete({}, sort=[('_id', -1)])
-    # elif table == 'environment':
+    # elif collection == 'environment':
     #     environment = db.environment
     #     environment.find_one_and_delete({}, sort=[('_id', -1)])
-    # elif table == 'physical_quantity':
+    # elif collection == 'physical_quantity':
     #     p_quantity = db.physical_quantity
     #     p_quantity.find_one_and_delete({}, sort=[('_id', -1)])
 
-    print("Deleting last record from " + table)
+    print("Deleting last record from " + collection_name)
     print("Finished operation. Collection cleared.\n")
     print("--------- \n")
 
 
 def deleteAllRecord(collection):
     """This is the option 7 in Application Menu.
-    Delets all the rows of a determined table.
+    Delets all the rows of a determined collection.
     Before the operation it asks the user for confimation.
 
     Parameters
     ----------
-    table : str
-        The name of the table which will have all records deleted.
+    collection : str
+        The name of the collection which will have all records deleted.
 
     Example
     -------
         #>>> deleteAllRecord('measures')
-        You are about to delete ALL records from the table 'measures'.
+        You are about to delete ALL records from the collection 'measures'.
         ARE YOU SURE? (y/n) yes
         Deleting all records from measures
         Finished operation. Collection cleared.
@@ -360,7 +360,7 @@ def deleteAllRecord(collection):
     collection = db[collection_name]
     collection.delete_many({})
 
-    print("Deleting all records from " + table)
+    print("Deleting all records from " + collection_name)
     print("Finished operation. Collection cleared.")
     print("--------- \n")
 
@@ -386,7 +386,7 @@ def menu():
     print('2 - Read air humidity                |    12 - Update user infos')
     print('3 - Read soil humidity               |    13 - Remove user')
     print('4 - Visualize the last record        |    14 - Read both (temp. and umid.) ')
-    print('5 - Visualize all record             |    15 - Delete record from table by id')
+    print('5 - Visualize all record             |    15 - Delete record from collection by id')
     print('6 - Delete last record               |    16 - *')
     print('7 - Delete all record                |    17 - *')
     print('8 - Visualize insertions by user     |    18 - *')
@@ -412,29 +412,29 @@ def main():
         elif item == '3':
             readSoilHumidity()
         elif item == '4':
-            table = str(input("> Enter table name: "))
-            selectLastRecord(table)
+            collection = str(input("> Enter collection name: "))
+            selectLastRecord(collection)
         elif item == '5':
-            table = str(input("> Enter table name: "))
-            selectAllRecord(table)
+            collection = str(input("> Enter collection name: "))
+            selectAllRecord(collection)
 
         elif item == '6':
             ans = str(input("You are about to delete the LAST " +
-                            "record of a table.\nARE YOU SURE? (y/n) "))
+                            "record of a collection.\nARE YOU SURE? (y/n) "))
             if ans.lower() == 'y' or ans.lower() == 'yes':
-                table = str(input("> Enter the table's name: "))
-                deleteLastRecord(table)
+                collection = str(input("> Enter the collection's name: "))
+                deleteLastRecord(collection)
             else:
                 print("Operation aborted. Returning to menu...")
                 print("--------- \n")
 
         elif item == '7':
             ans = str(input("> You are about to delete the ALL data " +
-                            "of a table. \nARE YOU SURE? (yes/no) "))
+                            "of a collection. \nARE YOU SURE? (yes/no) "))
 
             if ans.lower() == 'y' or ans.lower() == 'yes':
-                table = str(input("> Enter the table's name: "))
-                deleteAllRecord(table)
+                collection = str(input("> Enter the collection's name: "))
+                deleteAllRecord(collection)
             else:
                 print("Operation aborted. Returning to menu...")
                 print("--------- \n")
@@ -456,12 +456,12 @@ def main():
             users = db.users
             users_coll.insert_one({'usr_fullname': usr_fulname, 'usr_contact': usr_contact,
                               'username': username, 'password': pswd})
-            print("User create with success!")
+            print("User created with success!")
             print("--------- \n")
 
         elif item == '11':
             print("\n---------------- USERs INFOs-----------")
-            print("Fetching all records from table 'users'...")
+            print("Fetching all records from collection 'users'...")
             users = db.users
             rows = users_coll.find()
             if rows:
@@ -475,7 +475,7 @@ def main():
             print("\n-------------- UPDATE USER ---------")
             usrname = str(input("> Type the username of the user whose data will be updated: "))
             field = str(input("> Update which field(s)? Ex.: 'usr_fullname', 'active', 'pswd': "
-                              "(The '' signs are required)"))
+                              "(The ' ' signs are required)") )
             field = field.split(",")
             values = str(input("> Which values? (same order): "))
             values = values.split(",")
@@ -498,11 +498,11 @@ def main():
 
         elif item == '15':
             print("\n-------------- DELETE RECORD FROM TABLE BY ID----------")
-            collection_name = str(input("> Type the table's name from which the record will be removed: "))
+            collection_name = str(input("> Type the collection's name from which the record will be removed: "))
             collection = db[collection_name]
             id_record = str(input("> Type the id of the record to be removed: "))
             collection.find_one_and_delete({'_id': id_record})
-            # database.deleteDataFrom(table=table, condition='id', condition_value=id_record)
+            # database.deleteDataFrom(collection=collection, condition='id', condition_value=id_record)
             print("Data deleted with success!")
             print("--------- \n")
 
