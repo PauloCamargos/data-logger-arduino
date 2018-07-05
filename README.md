@@ -8,17 +8,33 @@ temperature and humidity from soil and ar into a database on localhost.
 Montagem:
 ![](docs/dht_11_connections.png)
 
-## Instalando a biblioteca no python
+## Instalando a biblioteca no Python 2 (parte relacional com PostgreSQL)
 No seu terminal, digite:
-* **psycopg2**: `sudo apt-get install psycopg2`
-* **pyserial**: `pip install pyserial`
+* **psycopg2**: `$ sudo apt-get install psycopg2`
+* **pyserial**: `$ pip  install pyserial`
+
+
+## Instalando bibliotecas para Python 3 (parte não-relacional com MongoDB)
+* **pymongo**: `$ pip  install pymongo`
+* **pyserial**: `$ pip  install pyserial`
+
+## Requisitos para funcoinamento do programa
+Para executar o programa, tenha certeza que os serviços do MongoDB foram inicializados
+* `$ sudo service mongod start`
+* `$ mongo start`
+
+Para que o programa funcione corretamente:
+* No banco de dados relacional crie as suas tabelas a partir do arquivo `docs\sql\codSQL.sql`.
+* No banco de dados não-relacional, execute o arquivo `MongoDB\py\conf.py` no seu terminal:
+
+  `$ python3 conf.py`
 
 
 ## Programando Arduino com o Atom
 
 1. Instale o pacote `platomformio` no atom (Edit -> Preferences -> Install).
-1. Instale o pacote python para comunicação:
- `pip install platformio`
+1. Instale o pacote Python para comunicação:
+ `$ pip  install platformio`
 1. Na pasta onde ficará o código rode: `platformio init --board=uno`
 1. Na pasta **src** criada coloque seu código **.ino**.
 1. Para usar os comandos use o atalho **Ctrl+Shift+P** no atom e digite: **platomformio**. Os comandos mais utilizados são o build (compilar) e o upload (compilar e carregar).
@@ -55,6 +71,5 @@ CMD | Descrição
 - Pablo Nunes
 - Paulo Camargos
 - Thiago Pereira de Oliveira
-- Vítor Menezes
 
 Colaborations: Ítalo Fernandes - github.com/italogfernandes
