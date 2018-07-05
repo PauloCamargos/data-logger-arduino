@@ -104,15 +104,24 @@ def readTemperature():
         The read temperature is 25.0ºC.
         Success! Data inserted into database.
     """
+    id_environment = db.find_one({'description': 'Ar'}, {_id: 1})
+    id_pquantity = db.find_one(
+        {'type': 'Tempeartura', 'unity': 'ºC'}, {_id: 1}
+    )
 
     print("Reading and inserting TEMPERATURE data into DB...")
     read_temperature = readUnity(TEMP_CHARACTER)
     if read_temperature != -1:
         print("The read temperature is " + str(read_temperature) + "ºC.")
         # columns: id_user, id_envrmt, read_value
-        measures = db.measures
-        measures_coll.insert_one({'id_user': user_id, 'id_environment': 3, 'id_pquantity': 1,
-                             'read_value': read_temperature})
+        measures_coll.insert_one(
+            {
+            'id_user': user_id,
+            'id_environment': id_environment,
+            'id_pquantity': id_pquantity,
+            'read_value': read_temperature
+            }
+        )
         print("Success! Data inserted into database.\n")
     else:
         print("Failed to read temperature. Try again in 5 seconds.")
@@ -166,14 +175,23 @@ def readSoilHumidity():
         Success! Data inserted into database.
 
     """
+
+    id_environment = db.find_one({'description': 'Solo'}, {_id: 1})
+    id_pquantity = db.find_one({'type': 'Umidade'}, {_id: 1})
+
     print("Reading and inserting HUMIDITY data into DB...")
     read_humidity = readUnity(SOIL_HUMIDITY_CHARACTER)
     if read_humidity != -1:
         print("The read humidity of the soil is " + str(read_humidity) + "%")
         # columns: id_user, id_envrmt, read_value
-        measures = db.measures
-        measures_coll.insert_one({'id_user': user_id, 'id_environment': 1, 'id_pquantity': 2,
-                             'read_value': read_humidity})
+        measures_coll.insert_one(
+            {
+                'id_user': user_id,
+                'id_environment': id_environment,
+                'id_pquantity': id_pquantity,
+                'read_value': read_humidity
+             }
+         )
         print("Success! Data inserted into database.\n")
     else:
         print("Failed to read temperature. Try again in 5 seconds.")
@@ -295,7 +313,7 @@ def deleteLastRecord(collection):
         You are about to delete THE LAST record from the table 'measures'.
         ARE YOU SURE? (y/n) yes
         Deleting last record from measures
-        Finished operation. Table cleared.
+        Finished operation. Collection cleared.
 
     """
 
@@ -314,7 +332,7 @@ def deleteLastRecord(collection):
     #     p_quantity.find_one_and_delete({}, sort=[('_id', -1)])
 
     print("Deleting last record from " + table)
-    print("Finished operation. Table cleared.\n")
+    print("Finished operation. Collection cleared.\n")
     print("--------- \n")
 
 
@@ -334,7 +352,7 @@ def deleteAllRecord(collection):
         You are about to delete ALL records from the table 'measures'.
         ARE YOU SURE? (y/n) yes
         Deleting all records from measures
-        Finished operation. Table cleared.
+        Finished operation. Collection cleared.
 
     """
     collection_name = collection
@@ -342,7 +360,7 @@ def deleteAllRecord(collection):
     collection.delete_many({})
 
     print("Deleting all records from " + table)
-    print("Finished operation. Table cleared.")
+    print("Finished operation. Collection cleared.")
     print("--------- \n")
 
 

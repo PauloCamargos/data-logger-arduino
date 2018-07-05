@@ -30,9 +30,9 @@ marcio = {
   password: "marcioufu"
 }
 
-db.users.save(paulo)
-db.users.save(thiago)
-db.users.save(marcio)
+db.users_coll.save(paulo)
+db.users_coll.save(thiago)
+db.users_coll.save(marcio)
 
 -----------------------------
 ar = {
@@ -46,6 +46,7 @@ agua ={
 solo = {
   description: "Solo"
 }
+
 db.environments.save(ar)
 db.environments.save(agua)
 db.environments.save(solo)
