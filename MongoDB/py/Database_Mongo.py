@@ -8,9 +8,9 @@ import serial.tools.list_ports
 ################
 # Global Data: #
 ################
-HUMIDITY_CHARACTER = 'A'
-TEMP_CHARACTER = 'T'
-SOIL_HUMIDITY_CHARACTER = 'S'
+HUMIDITY_CHARACTER = 'U'.encode()
+TEMP_CHARACTER = 'T'.encode()
+SOIL_HUMIDITY_CHARACTER = 'S'.encode()
 
 client = MongoClient('localhost', 27017)  # Iniciando a conexão com o banco
 db = client.datalogger  # Acessando a Collection "datalogger"
@@ -20,10 +20,10 @@ print(port_name)
 comport = serial.Serial(port_name, 9600, timeout=3)
 
 # Getting collections
-environment_coll = db.environment
+environment_coll = db.environments
 pquantity_coll = db.physical_quantity
-measues_coll = db.measues
-user_coll = db.users
+measures_coll = db.measures
+users_coll = db.users
 
 def checkUser():
     """Asks the user for input the USER_ID
@@ -35,6 +35,7 @@ def checkUser():
 
         """
     username_value = str(input('>>> Insert your username: '))
+
     user = users_coll.find_one(
         {'username': username_value},
         {'_id': 1, 'usr_fullname': 1}
@@ -52,32 +53,32 @@ user_fullname = user_data.get('usr_fullname')
 # Application Functions: #
 ##########################
 
-"""
+
 def readUnity(PARAM_CARACTER):
-        Reads a value from the arduino sensors
-    **ATENTION**: The serial port must be open before calling this function
-    It sends a request to the connected arduino and waits
-    for a line containing the answer to the request.
-    EasterEgg: Unity is everywhere hehehe
+    """        Reads a value from the arduino sensors
+        **ATENTION**: The serial port must be open before calling this function
+        It sends a request to the connected arduino and waits
+        for a line containing the answer to the request.
+        EasterEgg: Unity is everywhere hehehe
 
-    Parameters
-    ----------
-    PARAM_CARACTER : char
-        The type of measure (Temperature or Humidity) must be indicated,
-        by a character.
+        Parameters
+        ----------
+        PARAM_CARACTER : char
+            The type of measure (Temperature or Humidity) must be indicated,
+            by a character.
 
-    Returns
-    -------
-    float
-        The value returned by the arduino sensor as a float.
+        Returns
+        -------
+        float
+            The value returned by the arduino sensor as a float.
 
-    Example
-    -------
-        >> readUnity('T') # Temperature
-        25.0
-        >> readUnity('U') # Humidity
-        19.2
-
+        Example
+        -------
+            >> readUnity('T') # Temperature
+            25.0
+            >> readUnity('U') # Humidity
+            19.2
+    """
 
     comport.write(PARAM_CARACTER)
     time.sleep(1.8)
@@ -88,7 +89,7 @@ def readUnity(PARAM_CARACTER):
     # DEBUG: Uncomment here for debbuging
     # print '%s. Retorno da serial: %s' % (PARAM_CARACTER, VALUE_SERIAL)
     return VALUE_SERIAL
-"""
+
 
 
 def readTemperature():
@@ -104,9 +105,9 @@ def readTemperature():
         The read temperature is 25.0ºC.
         Success! Data inserted into database.
     """
-    id_environment = db.find_one({'description': 'Ar'}, {_id: 1})
-    id_pquantity = db.find_one(
-        {'type': 'Tempeartura', 'unity': 'ºC'}, {_id: 1}
+    id_environment = environment_coll.find_one({'description': 'Ar'}, {'_id': 1})
+    id_pquantity = pquantity_coll.find_one(
+        {'type': 'Temperatura', 'unity': '°C'}, {'_id': 1}
     )
 
     print("Reading and inserting TEMPERATURE data into DB...")
@@ -142,8 +143,8 @@ def readAirHumidity():
 
     """
 
-    id_environment = db.find_one({'description': 'Ar'}, {_id: 1})
-    id_pquantity = db.find_one({'type': 'Umidade'}, {_id: 1})
+    id_environment = environment_coll.find_one({'description': 'Ar'}, {'_id': 1})
+    id_pquantity = pquantity_coll.find_one({'type': 'Umidade'}, {'_id': 1})
 
     print("Reading and inserting HUMIDITY data into DB...")
     read_humidity = readUnity(HUMIDITY_CHARACTER)
@@ -176,8 +177,8 @@ def readSoilHumidity():
 
     """
 
-    id_environment = db.find_one({'description': 'Solo'}, {_id: 1})
-    id_pquantity = db.find_one({'type': 'Umidade'}, {_id: 1})
+    id_environment = environment_coll.find_one({'description': 'Solo'}, {'_id': 1})
+    id_pquantity = pquantity_coll.find_one({'type': 'Umidade'}, {'_id': 1})
 
     print("Reading and inserting HUMIDITY data into DB...")
     read_humidity = readUnity(SOIL_HUMIDITY_CHARACTER)
