@@ -5,6 +5,7 @@ import time  # time.sleep(int)
 import os  # os.system('clear')
 import math
 import serial.tools.list_ports
+import pprint
 
 ################
 # Global Data: #
@@ -106,10 +107,15 @@ def readTemperature():
         The read temperature is 25.0ºC.
         Success! Data inserted into database.
     """
-    id_environment = environment_coll.find_one({'description': 'Ar'}, {'_id': 1})
+    id_environment = environment_coll.find_one(
+        {'description': 'Ar'}, {'_id': 1}
+    )
+    id_environment = id_environment.get('_id')
+
     id_pquantity = pquantity_coll.find_one(
         {'type': 'Temperatura', 'unity': '°C'}, {'_id': 1}
     )
+    id_pquantity = id_pquantity.get('_id')
 
     print("Reading and inserting TEMPERATURE data into DB...")
     read_temperature = readUnity(TEMP_CHARACTER)
@@ -147,6 +153,9 @@ def readAirHumidity():
     id_environment = environment_coll.find_one({'description': 'Ar'}, {'_id': 1})
     id_pquantity = pquantity_coll.find_one({'type': 'Umidade'}, {'_id': 1})
 
+    id_environment = id_environment.get('_id')
+    id_pquantity = id_pquantity.get('_id')
+
     print("Reading and inserting HUMIDITY data into DB...")
     read_humidity = readUnity(HUMIDITY_CHARACTER)
     if read_humidity != -1:
@@ -180,6 +189,9 @@ def readSoilHumidity():
 
     id_environment = environment_coll.find_one({'description': 'Solo'}, {'_id': 1})
     id_pquantity = pquantity_coll.find_one({'type': 'Umidade'}, {'_id': 1})
+
+    id_environment = id_environment.get('_id')
+    id_pquantity = id_pquantity.get('_id')
 
     print("Reading and inserting HUMIDITY data into DB...")
     read_humidity = readUnity(SOIL_HUMIDITY_CHARACTER)
@@ -365,6 +377,67 @@ def deleteAllRecord(collection):
     print("Finished operation. Collection cleared.")
     print("--------- \n")
 
+def visualizeByUser():
+    print("Vai filhão!")
+    pipeline = [
+    {
+        '$lookup': {
+            'from': 'users',
+            'localField': 'id_user',
+            'foreignField': '_id',
+            'as': 'user_measures'
+
+        }
+    },
+    {
+        '$unwind': '$user_measures'
+    },
+    {
+        "$lookup": {
+            "from": "measures",
+            "localField": "id_environment",
+            "foreignField": "_id",
+            "as": "user_measures_environment"
+        }
+    },
+    {
+        "$unwind": "$user_measures_environment"
+    }
+
+    ]
+
+    # collect_result = db.measures_coll.aggregate(
+    # [
+    # {
+    #     '$lookup': {
+    #         'from': 'users',
+    #         'localField': 'id_user',
+    #         'foreignField': '_id',
+    #         'as': 'user_measures'
+    #
+    #     }
+    # },
+    # {
+    #     '$unwind': '$user_measures'
+    # }
+    # # {
+    # #     "$lookup": {
+    # #         "from": "users",
+    # #         "localField": "id_environment",
+    # #         "foreignField": "_id",
+    # #         "as": "user_measures_environment"
+    # #     }
+    # # },
+    # # {
+    # #     "$unwind": "$user_measures_environment"
+    # # }
+    # ]
+    # )
+
+    # pprint.pprint(collect_result)
+    for doc in (users_coll.aggregate(pipeline)):
+        pprint.pprint(doc)
+
 
 def closeConnecetion(self):
     """Closes the connection.
@@ -440,8 +513,8 @@ def main():
                 print("Operation aborted. Returning to menu...")
                 print("--------- \n")
 
-        # TODO elif item == '8':
-        #    visualizeByUser()
+        elif item == '8':
+           visualizeByUser()
 
         elif item == 'C' or item == 'c':
             os.system('cls' if os.name == 'nt' else 'clear')
@@ -504,7 +577,7 @@ def main():
             collection_name = str(input("> Type the collection's name from which the record will be removed: "))
             collection = db[collection_name]
             id_record = str(input("> Type the id of the record to be removed: "))
-            collection.find_one_and_delete({'_id': ObjectId(id_record)})
+            collection.delete_one({'_id': ObjectId(id_record) })
             # database.deleteDataFrom(collection=collection, condition='id', condition_value=id_record)
             print("Data deleted with success!")
             print("--------- \n")
