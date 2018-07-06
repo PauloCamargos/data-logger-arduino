@@ -385,40 +385,46 @@ def visualizeByUser():
             'from': 'users',
             'localField': 'id_user',
             'foreignField': '_id',
-            'as': 'user_measures'
+            'as': 'user'
 
         }
     },
     {
-        '$unwind': '$user_measures'
+        '$unwind': '$user'
     },
     {
         "$lookup": {
             "from": "environments",
             "localField": "id_environment",
             "foreignField": "_id",
-            "as": "user_measures_environment"
+            "as": "environment"
         }
     },
     {
-        "$unwind": "$user_measures_environment"
+        "$unwind": "$environment"
     },
     {
         "$lookup": {
             "from": "physical_quantity",
             "localField": "id_pquantity",
             "foreignField": "_id",
-            "as": "user_measures_environment_pquantity"
+            "as": "pquantity"
         }
     },
         {
-            "$unwind": "$user_measures_environment_pquantity"
+            "$unwind": "$pquantity"
         }
     ]
 
     # pprint.pprint(collect_result)
     for doc in (measures_coll.aggregate(pipeline)):
-        pprint.pprint(doc)
+
+        pprint.pprint(
+        str(doc.get("user").get("fullname")) + " | " +
+        str(doc.get("pquantity").get("type")) + " | " +
+        str(doc.get("environment").get("description")) + " | " +
+        str(doc.get("read_value")) + 
+        str(doc.get("pquantity").get("unity")))
 
 
 def closeConnecetion(self):
